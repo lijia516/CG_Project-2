@@ -39,7 +39,10 @@ public:
     int	getSampling() const { return m_nSampling; }
     int	getMultiThreads() const { return m_nMultiThreads; }
 	int		getFilterWidth() const { return m_nFilterWidth; }
-
+    
+    void setMultiThreads(bool has) {m_hasMultiThreads = has;}
+    
+    bool hasMultiThreads() {return m_hasMultiThreads; }
 	bool	shadowSw() const { return m_shadows; }
 	bool	smShadSw() const { return m_smoothshade; }
 
@@ -61,7 +64,10 @@ protected:
 	bool m_smoothshade;  // turn on/off smoothshading?
 	bool		m_usingCubeMap;  // render with cubemap
 	bool		m_gotCubeMap;  // cubemap defined
+    bool m_hasMultiThreads;
+    
 	int m_nFilterWidth;  // width of cubemap filter
+    
 };
 
 #endif

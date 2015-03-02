@@ -108,6 +108,25 @@ void GraphicalUI::cb_about(Fl_Menu_* o, void* v)
 	fl_message("RayTracer Project for CS384g.");
 }
 
+
+
+
+void GraphicalUI::cb_multiThreadsLightButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    
+    if (pUI->m_hasMultiThreads==true) pUI->m_hasMultiThreads=false;
+    
+    else {
+        
+        pUI->m_hasMultiThreads=true;
+        
+    }
+    
+    std::cout << "multi threads: " << pUI->m_hasMultiThreads << "\n";
+}
+
+
 void GraphicalUI::cb_sizeSlides(Fl_Widget* o, void* v)
 {
 	pUI=(GraphicalUI*)(o->user_data());
@@ -177,7 +196,7 @@ void GraphicalUI::cb_render(Fl_Widget* o, void* v) {
         // Save the window label
         const char *old_label = pUI->m_traceGlWindow->label();
         
-        if (false) {
+        if (pUI->m_hasMultiThreads) {
             gobal_y = 0;
             int num = pUI->getMultiThreads();
             std::vector<std::thread> threads;
@@ -403,9 +422,19 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // set up "antiAliased" button
-    m_antiAliasedButton = new Fl_Button(330, 125, 100, 25, "&Anti-aliased");
+    m_antiAliasedButton = new Fl_Button(330, 125, 110, 25, "&Anti-aliased");
     m_antiAliasedButton->user_data((void*)(this));
     m_antiAliasedButton->callback(cb_antiAliased);
+    
+    
+    
+    
+    // Add multi Threads button
+    m_multiThreadsLightButton = new Fl_Light_Button(330,160,110,25,"&Multi Threads");
+    m_multiThreadsLightButton->user_data((void*)(this));   // record self to be used by static callback functions
+    m_multiThreadsLightButton->callback(cb_multiThreadsLightButton);
+    
+    
 
 	// install depth slider
 	m_depthSlider = new Fl_Value_Slider(10, 40, 180, 20, "Recursion Depth");
@@ -463,7 +492,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install multiThreads slider
-    m_multiThreadsSlider = new Fl_Value_Slider(10, 150, 180, 20, "threads number");
+    m_multiThreadsSlider = new Fl_Value_Slider(10, 160, 180, 20, "threads number");
     m_multiThreadsSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_multiThreadsSlider->type(FL_HOR_NICE_SLIDER);
     m_multiThreadsSlider->labelfont(FL_COURIER);

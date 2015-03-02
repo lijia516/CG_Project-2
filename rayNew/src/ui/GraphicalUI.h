@@ -57,6 +57,8 @@ public:
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
     Fl_Button*			m_antiAliasedButton;
+    
+    Fl_Light_Button*    m_multiThreadsLightButton;
 
 	CubeMapChooser*     m_cubeMapChooser;
 
@@ -104,6 +106,8 @@ private:
 	static void cb_ssCheckButton(Fl_Widget* o, void* v);
 	static void cb_shCheckButton(Fl_Widget* o, void* v);
 	static void cb_bfCheckButton(Fl_Widget* o, void* v);
+    
+    static void cb_multiThreadsLightButton(Fl_Widget* o, void* v);
 
 	static bool stopTrace;
 	static bool doneTrace;
