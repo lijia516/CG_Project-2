@@ -141,4 +141,55 @@ public:
         if (longest == z_long) return 2;
         
     }
+    
+ /*   bool axis_intersect(const ray& r, double& tMin, double& tMax, int currentaxis) const {
+        Vec3d R0 = r.getPosition();
+        Vec3d Rd = r.getDirection();
+        tMin = -1.0e308; // 1.0e308 is close to infinity... close enough for us!
+        tMax = 1.0e308;
+        double ttemp;
+        
+        double vd = Rd[currentaxis];
+        
+        double temp_axis;
+        
+        
+        switch (currentaxis) {
+            case 0:
+                temp_axis = 1;
+                break;
+            case 1:
+                temp_axis = 2;
+                break;
+            case 2:
+                temp_axis = 3;
+                break;
+                
+            default:
+                break;
+        }
+        
+        
+        //if the ray is parallel to the face's plane (=0.0)
+        if( vd == 0.0 ) return false;
+        
+        double v1 = bmin[currentaxis] - R0[currentaxis];
+        double v2 = bmax[currentaxis] - R0[currentaxis];
+        // two slab intersections
+        double t1 = v1/vd;
+        double t2 = v2/vd;
+        if ( t1 > t2 ) { // swap t1 & t2
+                ttemp = t1;
+                t1 = t2;
+                t2 = ttemp;
+        }
+        if (t1 > tMin) tMin = t1;
+        if (t2 < tMax) tMax = t2;
+        if (tMax < RAY_EPSILON) return false; // box is behind ray
+        }
+        return true; // it made it past all 3 axes.
+    }
+  
+  */
+    
 };

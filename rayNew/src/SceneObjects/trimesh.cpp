@@ -204,7 +204,7 @@ bool Trimesh::intersectLocal(ray& r, isect& i) const
 
 		//printf("%d -> %d\n", faces.size(),result.size());
 		for( iter j = result.begin(); j != result.end(); ++j )
-				//for( iter j = faces.begin(); j != faces.end(); ++j )
+        //for( iter j = faces.begin(); j != faces.end(); ++j )
 		{
 				isect cur;
 				if( (*j)->intersectLocal( r, cur ) )
@@ -252,6 +252,12 @@ bool TrimeshFace::intersectLocal(ray& r, isect& i) const
     
     i.obj = this;
     i.t = t;
+    
+    Vec3d ba = (b - a);
+    Vec3d ca = (c - a);
+    ba.normalize();
+    ca.normalize();
+    i.setUVCoordinates(Vec2d(ba*(q-a),ca*(q-a)));
     
     // u and v
     
