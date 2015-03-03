@@ -14,6 +14,7 @@
 
 CubeMapChooser::CubeMapChooser() {
 
+    
 	w = new Fl_Menu_Window(395, 355, "Load Cubemap");
 	w->user_data((void*)(this));
 
@@ -93,27 +94,42 @@ void CubeMapChooser::cb_cancel(Fl_Widget* o, void* v) {
 
 void CubeMapChooser::cb_ok(Fl_Widget* o, void* v) {
 	CubeMapChooser* ch = (CubeMapChooser*)(o->parent()->user_data());
+    
+    std::cout<< "hello1 " <<"\n";
+    
 	int allGreen = 0;
 	while (ch->fb[allGreen]->selection_color() == FL_GREEN) allGreen++;
+    
+     std::cout<< "allGreen: " << allGreen <<"\n";
+    
 	if (allGreen == 6) {
 		CubeMap* cm = 0;
-		if (ch->caller->getRayTracer()->haveCubeMap())
+        
+        if (ch->caller->getRayTracer()->haveCubeMap()){
+            
 			cm = ch->caller->getRayTracer()->getCubeMap();
-		else {
+
+        }else {
 			cm = new CubeMap();
 			ch->caller->getRayTracer()->setCubeMap(cm);
 		}
+        
 		cm->setXposMap(ch->cubeFace[0]);
 		cm->setXnegMap(ch->cubeFace[1]);
 		cm->setYposMap(ch->cubeFace[2]);
 		cm->setYnegMap(ch->cubeFace[3]);
 		cm->setZposMap(ch->cubeFace[4]);
 		cm->setZnegMap(ch->cubeFace[5]);
+        
 		ch->caller->setCubeMap(true);
 		ch->caller->useCubeMap(true);
+        ch->caller->getRayTracer()->m_useCubeMap = true;
 		ch->caller->m_filterSlider->activate();
 		ch->caller->m_cubeMapCheckButton->activate();
 		ch->caller->m_cubeMapCheckButton->value(1);
+        
+        std::cout<< "hello3 " <<"\n";
+        
 	}
 	o->parent()->hide();
 }

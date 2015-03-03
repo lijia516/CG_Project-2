@@ -19,6 +19,7 @@ extern TraceUI* traceUI;
 #include <iostream>
 #include <fstream>
 
+
 using namespace std;
 
 // Use this variable to decide if you want to print out
@@ -83,8 +84,7 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
 	  //const Material& m = i.getMaterial();
 	  //colorC = m.shade(scene, r, i);
         
-        
-        
+      
         const Material& m = i.getMaterial();
         colorC = m.shade(scene, r, i);
         
@@ -128,24 +128,28 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         }
         
         
-        
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
 		// is just black.
-		colorC = Vec3d(0.0, 0.0, 0.0);
+        
+        
+        if (m_useCubeMap) colorC = cubemap->getColor(r);
+        else colorC = Vec3d(0, 0, 0);
+        
 	}
 	return colorC;
 }
 
 RayTracer::RayTracer()
-	: scene(0), buffer(0), buffer_width(256), buffer_height(256), m_bBufferReady(false)
+: scene(0), buffer(0), buffer_width(256), buffer_height(256), m_bBufferReady(false), cubemap(0), m_useCubeMap(false)
 {}
 
 RayTracer::~RayTracer()
 {
 	delete scene;
 	delete [] buffer;
+    delete cubemap;
 }
 
 void RayTracer::getBuffer( unsigned char *&buf, int &w, int &h )

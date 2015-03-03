@@ -49,6 +49,7 @@ public:
         CubeMap* cubemap;
 
         bool m_bBufferReady;
+        bool m_useCubeMap;
 };
 
 #endif // __RAYTRACER_H__

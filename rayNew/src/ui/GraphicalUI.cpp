@@ -30,6 +30,7 @@ bool GraphicalUI::doneTrace = true;
 GraphicalUI* GraphicalUI::pUI = NULL;
 char* GraphicalUI::traceWindowLabel = "Raytraced Image";
 bool TraceUI::m_debug = false;
+bool TraceUI::m_cubeMap = false;
 
 
 static int gobal_y;
@@ -87,7 +88,9 @@ void GraphicalUI::cb_exit(Fl_Menu_* o, void* v)
 	pUI->m_traceGlWindow->hide();
 	pUI->m_mainWindow->hide();
 	pUI->m_debuggingWindow->hide();
+    pUI->m_cubeMapChooser->hide();
 	TraceUI::m_debug = false;
+    TraceUI::m_cubeMap = false;
 }
 
 void GraphicalUI::cb_exit2(Fl_Widget* o, void* v) 
@@ -100,7 +103,9 @@ void GraphicalUI::cb_exit2(Fl_Widget* o, void* v)
 	pUI->m_traceGlWindow->hide();
 	pUI->m_mainWindow->hide();
 	pUI->m_debuggingWindow->hide();
+    pUI->m_cubeMapChooser->hide();
 	TraceUI::m_debug = false;
+    TraceUI::m_cubeMap = false;
 }
 
 void GraphicalUI::cb_about(Fl_Menu_* o, void* v) 
@@ -151,6 +156,12 @@ void GraphicalUI::cb_samplingSlides(Fl_Widget* o, void* v)
     ((GraphicalUI*)(o->user_data()))->m_nSampling=int( ((Fl_Slider *)o)->value() ) ;
 }
 
+
+void GraphicalUI::cb_filterSlides(Fl_Widget* o, void* v)
+{
+    ((GraphicalUI*)(o->user_data()))->m_nFilter=int( ((Fl_Slider *)o)->value() ) ;
+}
+
 void GraphicalUI::cb_multiThreadsSlides(Fl_Widget* o, void* v)
 {
     ((GraphicalUI*)(o->user_data()))->m_nMultiThreads=int( ((Fl_Slider *)o)->value() ) ;
@@ -176,6 +187,22 @@ void GraphicalUI::cb_debuggingDisplayCheckButton(Fl_Widget* o, void* v)
 	    pUI->m_debuggingWindow->hide();
 	    pUI->m_debug = false;
 	  }
+}
+
+void GraphicalUI::cb_cubeMapCheckButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    pUI->m_cubeMapInfo = (((Fl_Check_Button*)o)->value() == 1);
+    if (pUI->m_cubeMapInfo)
+    {
+        pUI->m_cubeMapChooser->show();
+        pUI->m_cubeMap = true;
+    }
+    else
+    {
+        pUI->m_cubeMapChooser->hide();
+        pUI->m_cubeMap = false;
+    }
 }
 
 void GraphicalUI::cb_render(Fl_Widget* o, void* v) {
@@ -491,6 +518,21 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     
+    // install sampling slider
+    m_filterSlider = new Fl_Value_Slider(10, 180, 180, 20, "filter slider");
+    m_filterSlider->user_data((void*)(this));	// record self to be used by static callback functions
+    m_filterSlider->type(FL_HOR_NICE_SLIDER);
+    m_filterSlider->labelfont(FL_COURIER);
+    m_filterSlider->labelsize(12);
+    m_filterSlider->minimum(1);
+    m_filterSlider->maximum(16);
+    m_filterSlider->step(1);
+    m_filterSlider->value(m_nFilter);
+    m_filterSlider->align(FL_ALIGN_RIGHT);
+    m_filterSlider->callback(cb_filterSlides);
+    
+    
+    
     // install multiThreads slider
     m_multiThreadsSlider = new Fl_Value_Slider(10, 160, 180, 20, "threads number");
     m_multiThreadsSlider->user_data((void*)(this));	// record self to be used by static callback functions
@@ -510,6 +552,12 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
 	m_debuggingDisplayCheckButton->user_data((void*)(this));
 	m_debuggingDisplayCheckButton->callback(cb_debuggingDisplayCheckButton);
 	m_debuggingDisplayCheckButton->value(m_displayDebuggingInfo);
+    
+    // set up debugging display checkbox
+    m_cubeMapCheckButton = new Fl_Check_Button(10, 400, 140, 20, "Cube Map Chooser");
+    m_cubeMapCheckButton->user_data((void*)(this));
+    m_cubeMapCheckButton->callback(cb_cubeMapCheckButton);
+    m_cubeMapCheckButton->value(m_cubeMapInfo);
 
 	m_mainWindow->callback(cb_exit2);
 	m_mainWindow->when(FL_HIDE);
@@ -522,6 +570,9 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
 
 	// debugging view
 	m_debuggingWindow = new DebuggingWindow();
+    
+    m_cubeMapChooser = new CubeMapChooser();
+    m_cubeMapChooser->setCaller(this);
 }
 
 #endif

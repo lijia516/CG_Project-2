@@ -18,7 +18,7 @@ class RayTracer;
 
 class TraceUI {
 public:
-	TraceUI() : m_nDepth(0), m_nSize(512), m_nSampling(1), m_nMultiThreads(1),m_displayDebuggingInfo(false),
+	TraceUI() : m_nDepth(0), m_nSize(512), m_nSampling(1), m_nFilter(1), m_nMultiThreads(1),m_displayDebuggingInfo(false),
                     m_shadows(true), m_smoothshade(true), raytracer(0),
                     m_nFilterWidth(1)
                     {}
@@ -37,8 +37,10 @@ public:
 	int	getSize() const { return m_nSize; }
 	int	getDepth() const { return m_nDepth; }
     int	getSampling() const { return m_nSampling; }
+    int	getFilter() const { return m_nFilter; }
     int	getMultiThreads() const { return m_nMultiThreads; }
 	int		getFilterWidth() const { return m_nFilterWidth; }
+    
     
     void setMultiThreads(bool has) {m_hasMultiThreads = has;}
     
@@ -47,6 +49,10 @@ public:
 	bool	smShadSw() const { return m_smoothshade; }
 
 	static bool m_debug;
+    static bool m_cubeMap;
+    
+    bool		m_usingCubeMap;  // render with cubemap
+    bool		m_gotCubeMap;  // cubemap defined
 
 protected:
 	RayTracer*	raytracer;
@@ -54,16 +60,17 @@ protected:
 	int	m_nSize;	// Size of the traced image
 	int	m_nDepth;	// Max depth of recursion
     int	m_nSampling;	// number of samples
+    int	m_nFilter;	// number of samples
     int	m_nMultiThreads;	// number of samples
 
 	// Determines whether or not to show debugging information
 	// for individual rays.  Disabled by default for efficiency
 	// reasons.
 	bool m_displayDebuggingInfo;
+    bool m_cubeMapInfo;
 	bool m_shadows;  // compute shadows?
 	bool m_smoothshade;  // turn on/off smoothshading?
-	bool		m_usingCubeMap;  // render with cubemap
-	bool		m_gotCubeMap;  // cubemap defined
+   
     bool m_hasMultiThreads;
     
 	int m_nFilterWidth;  // width of cubemap filter

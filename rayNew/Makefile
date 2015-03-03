@@ -29,7 +29,7 @@ CFLAGS = -O3
 ALL.O = src/main.o src/getopt.o src/RayTracer.o \
 	src/ui/CommandLineUI.o src/ui/GraphicalUI.o src/ui/TraceGLWindow.o \
 	src/ui/debuggingView.o src/ui/glObjects.o src/ui/debuggingWindow.o \
-	src/ui/ModelerCamera.o \
+	src/ui/ModelerCamera.o src/ui/CubeMapChooser.o\
 	src/fileio/bitmap.o src/fileio/buffer.o \
 	src/fileio/pngimage.o \
 	src/parser/Token.o src/parser/Tokenizer.o \
@@ -38,7 +38,7 @@ ALL.O = src/main.o src/getopt.o src/RayTracer.o \
 	src/scene/material.o src/scene/ray.o src/scene/scene.o \
 	src/SceneObjects/Box.o src/SceneObjects/Cone.o \
 	src/SceneObjects/Cylinder.o src/SceneObjects/trimesh.o \
-	src/SceneObjects/Sphere.o src/SceneObjects/Square.o
+	src/SceneObjects/Sphere.o src/SceneObjects/Square.o src/scene/cubeMap.o
 
 ray: $(ALL.O)
 	$(CC) $(CFLAGS) -o $@ $(ALL.O) $(INCLUDE) $(LIBDIR) $(LIBS)
