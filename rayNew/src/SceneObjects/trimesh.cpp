@@ -137,8 +137,8 @@ void KdTree_tm::splitTree(KdNode_tm *node, int depth){
 
 void KdTree_tm::searchTree(KdNode_tm *node, ray &r, std::vector<TrimeshFace*> &result){
 		
-    double tMax = 100;
-    double tMin = 0;
+    double tMax;
+    double tMin;
     
     if (node->node_bounds.intersect(r, tMin, tMax)) {
     

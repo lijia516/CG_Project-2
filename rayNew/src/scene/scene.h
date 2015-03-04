@@ -218,12 +218,12 @@ protected:
 };
 
 
-class KDNode{
+class KdNode{
 public:
-    KDNode();
+    KdNode() {}
     BoundingBox node_bounds;
-    KDNode * left = NULL;
-    KDNode * right = NULL;
+    KdNode * left = NULL;
+    KdNode * right = NULL;
     std::vector<Geometry*> objects;
     int axis;
     double mid;
@@ -232,13 +232,10 @@ public:
 
 class KdTree{
 public:
-    KdTree() { root = new KDNode();}
-    KDNode *root;
-    static void buildTree(KDNode *node, int depth);
-    static void searchTree(KDNode *node, ray &r, std::vector<Geometry*> &result);
-    static bool compare0(Geometry *a, Geometry* b);
-    static bool compare1(Geometry *a, Geometry* b);
-    static bool compare2(Geometry *a, Geometry* b);
+    KdTree() { root = new KdNode();}
+    KdNode *root;
+    static void splitTree(KdNode *node, int depth);
+    static void searchTree(KdNode *node, ray &r, std::vector<Geometry*> &result);
 };
 
 

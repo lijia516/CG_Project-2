@@ -49,9 +49,7 @@ Vec3d Material::shade(Scene *scene, const ray& r, const isect& i) const
     if (Trans()) {
         
         I = I + ka(i) % (Vec3d(1.0, 1.0, 1.0) - kt(i)) % scene->ambient();
-        
     } else {
-        
         I = I + ka(i) % scene->ambient();
     }
     
@@ -63,18 +61,15 @@ Vec3d Material::shade(Scene *scene, const ray& r, const isect& i) const
         //diffuse
         Vec3d N = i.N;
         Vec3d L = pLight->getDirection(q);
-        //   Vec3d NL = N % L;
-        //   double NLv = NL[0] + NL[1] + NL[2];
+        
         double NLv = N * L;
         Vec3d diffuseTerm = kd(i) * fmax(0, NLv);
-        
         
         //specular reflection
         Vec3d R = N * 2* NLv - L;
         Vec3d V = - r.getDirection();
  
         Vec3d specularTerm = ks(i) * pow (fmax(0, R * V), shininess(i));
-        
         I = I + (diffuseTerm + specularTerm) % atten % pLight->getColor();
     }
     

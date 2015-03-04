@@ -94,33 +94,25 @@ TextureMap* Scene::getTexture(string name) {
 }
 
 
-
-KDNode::KDNode(){
-}
-
-
 void Scene::buildKdTree(){
-    //printf("Building Mesh KD tree...\n");
     
     kdtree = new KdTree();
-    KDNode* root = kdtree->root;
+    KdNode* root = kdtree->root;
     root->objects = objects;
     
     typedef vector<Geometry*>::const_iterator iter;
     for(iter j = objects.begin(); j != objects.end(); ++j) {
-        //printf("TMB %f\n",(*j)->getBoundingBox().getMin()[0]);
         root->node_bounds.merge((*j)->getBoundingBox());
     }
     
-    kdtree->buildTree(root, 0);
-    //printf("Done!\n");
+    kdtree->splitTree(root, 0);
     return;
 }
 
 
 
-void KdTree::buildTree(KDNode *node, int depth){
- //   printf("Scene KD depth- size:%d - %d\n", depth, node->objects.size());
+void KdTree::splitTree(KdNode *node, int depth){
+    
     if(node->objects.size() <= TraceUI::m_nKdLeaves || depth == TraceUI::m_nKdDepth)
         return;
     
@@ -141,14 +133,14 @@ void KdTree::buildTree(KDNode *node, int depth){
 
     node->mid = mid;
     
-    node->left = new KDNode();
-    node->right = new KDNode();
+    node->left = new KdNode();
+    node->right = new KdNode();
     
     for(iter j = node->objects.begin(); j != node->objects.end(); ++j) {
-        if((*j)->getBoundingBox().getMax()[node->axis] >= node->mid){//right
+        if((*j)->getBoundingBox().getMax()[node->axis] >= node->mid){
             node->right->objects.push_back(*j);
             node->right->node_bounds.merge((*j)->getBoundingBox());
-        }else if((*j)->getBoundingBox().getMin()[node->axis] <= node->mid ){//left
+        }else if((*j)->getBoundingBox().getMin()[node->axis] <= node->mid ){
             node->left->objects.push_back(*j);
             node->left->node_bounds.merge((*j)->getBoundingBox());
         }
@@ -168,34 +160,33 @@ void KdTree::buildTree(KDNode *node, int depth){
     
     if (((match*1.0 / node->left->objects.size()) < 0.5) || ((match * 1.0 / node->right->objects.size()) < 0.5)){
     
-        buildTree(node->right,  depth + 1);
-        buildTree(node->left, depth + 1);
+        splitTree(node->right,  depth + 1);
+        splitTree(node->left, depth + 1);
         return;
     }
 }
 
 //dfs
-void KdTree::searchTree(KDNode *node, ray &r, std::vector<Geometry*> &result){
+void KdTree::searchTree(KdNode *node, ray &r, std::vector<Geometry*> &result){
     
     
-    double tMax = 100;
-    double tMin = 0;
+    double tMax;
+    double tMin;
     
     if (node->node_bounds.intersect(r, tMin, tMax)) {
     
         typedef vector<Geometry*>::const_iterator iter;
-        if(node->right == NULL && node->left == NULL){//leaf
+        if(node->right == NULL && node->left == NULL){
             for(iter j = node->objects.begin(); j != node->objects.end(); ++j)
                 result.push_back(*j);
             return;
         }
     
-        double tTMP = 100;
-        if(node->right != NULL && node->right->objects.size() != 0 && node->right->node_bounds.intersect(r,tMax, tMin)){
+        if(node->right->objects.size() != 0 && node->right->node_bounds.intersect(r,tMin, tMax)){
             searchTree(node->right, r, result);
         }
     
-        if(node->left != NULL && node->right->objects.size() != 0 && node->left->node_bounds.intersect(r, tMax, tMin)){
+        if(node->right->objects.size() != 0 && node->left->node_bounds.intersect(r, tMin, tMax)){
             searchTree(node->left, r, result);
         }
     }

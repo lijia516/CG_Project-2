@@ -123,31 +123,6 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         
       
         const Material& m = i.getMaterial();
-        
-        
-        
-        
-        
-        
-        
-        //    Vec3d eye = scene->getCamera().getEye();
-        //    Vec3d pos = r.at(i.t);
-        
-        //   if ((eye - pos).length() > 0.5) {
-        
-        
-        //        double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-        //        double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-        //        double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-        
-        //        R += Vec3d(dx, dy, dz);
-        
-        //    }
-        
-        
-        
-        
-        
         colorC = m.shade(scene, r, i);
         
         if (depth < 1) {
@@ -155,15 +130,9 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
             return colorC;
         }
         
-      //  std::cout <<"colorC"<<colorC[0]<<","<<colorC[1]<<","<<colorC[2]<<"\n";
-       // std::cout << TraceUI::m_nThreshold<<"\n";
         
         
         if (colorC[0] < TraceUI::m_nThreshold && colorC[1] < TraceUI::m_nThreshold && colorC[2] < TraceUI::m_nThreshold) {
-            
-         //   std::cout <<"return\n";
-         //   std::cout <<"colorC"<<colorC[0]<<","<<colorC[1]<<","<<colorC[2]<<"\n";
-         //   std::cout << TraceUI::m_nThreshold<<"\n";
             
             return colorC;
         }
@@ -228,11 +197,7 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
             new_r = ray(r.at(i.t), T);
             colorC = colorC + m.kt(i) % traceRay(new_r,depth - 1);
         }
-        
-        
-        
-        
-        
+
         
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
@@ -365,9 +330,7 @@ void RayTracer::antiAliased(int sampling, int i, int j) {
         
         color += adaptive_antiAliased ( x, y , x_gap / 2, y_gap / 2, -1, temp_col_ld, temp_col_rd, temp_col_lu, temp_col_ru);
         color = color / (aa_depth_total+ 1);
-        
-        std::cout <<"color"<<color[0]<<","<<color[1]<<","<<color[2]<<"\n";
-        
+
         
         aa_depth_total = 0;
     
@@ -500,9 +463,6 @@ Vec3d RayTracer::adaptive_antiAliased ( double x, double y , double x_gap, doubl
         }
     
     }
-    
-    
-  //  std::cout <<"finish recursion fun: aa_depth_total"<<aa_depth_total<<"\n";
     
     return col;
 }
