@@ -39,10 +39,13 @@ Vec3d RayTracer::trace(double x, double y)
   ray r(Vec3d(0,0,0), Vec3d(0,0,0), ray::VISIBILITY);
   
     
-  //  scene->getCamera().rayThrough(x,y,r);
-  //  Vec3d ret = traceRay(r, traceUI->getDepth());
-  //  ret.clamp();
-  //  return ret;
+    if (!TraceUI::m_glossyRefection) {
+        
+        scene->getCamera().rayThrough(x,y,r);
+        Vec3d ret = traceRay(r, traceUI->getDepth());
+        ret.clamp();
+        return ret;
+    }
     
     
     Vec3d ret(0,0,0);
@@ -118,6 +121,31 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         
       
         const Material& m = i.getMaterial();
+        
+        
+        
+        
+        
+        
+        
+        //    Vec3d eye = scene->getCamera().getEye();
+        //    Vec3d pos = r.at(i.t);
+        
+        //   if ((eye - pos).length() > 0.5) {
+        
+        
+        //        double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+        //        double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+        //        double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+        
+        //        R += Vec3d(dx, dy, dz);
+        
+        //    }
+        
+        
+        
+        
+        
         colorC = m.shade(scene, r, i);
         
         if (depth < 1) {
@@ -146,14 +174,36 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         Vec3d R = i.N * 2* NVv - V;
         
         
-        
-        double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-        double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-        double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-        
-        R += Vec3d(dx, dy, dz);
+        if (TraceUI::m_glossyRefection) {
+            
+            
+            double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+            double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+            double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+            
+            R += Vec3d(dx, dy, dz);
 
+            
+        }
         
+        
+        
+        
+        
+        
+    //    Vec3d eye = scene->getCamera().getEye();
+    //    Vec3d pos = r.at(i.t);
+        
+     //   if ((eye - pos).length() > 0.5) {
+        
+        
+    //        double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+    //        double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+    //        double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+        
+    //        R += Vec3d(dx, dy, dz);
+
+    //    }
         
         ray new_r = ray(r.at(i.t), R, ray::VISIBILITY);
         Vec3d a = m.kr(i) % traceRay(new_r,depth - 1);

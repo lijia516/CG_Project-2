@@ -36,6 +36,8 @@ int TraceUI::m_nKdDepth = 10;
 int TraceUI::m_nKdLeaves = 3;
 double TraceUI::m_nThreshold = 0;
 bool TraceUI::m_hasJitteredSupersample = false;
+bool TraceUI::m_glossyRefection = false;
+
 
 
 static int gobal_y;
@@ -271,6 +273,27 @@ void GraphicalUI::cb_cubeMapCheckButton(Fl_Widget* o, void* v)
     
     std::cout << "m_cubeMap: " << pUI->m_cubeMap << "\n";
 }
+
+
+void GraphicalUI::cb_grCheckButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    pUI->m_grInfo = (((Fl_Check_Button*)o)->value() == 1);
+    if (pUI->m_grInfo)
+    {
+      
+        pUI->m_glossyRefection = true;
+    }
+    else
+    {
+     
+        pUI->m_glossyRefection = false;
+    }
+    
+    
+    std::cout << "m_glossyRefection: " << pUI->m_glossyRefection << "\n";
+}
+
 
 void GraphicalUI::cb_render(Fl_Widget* o, void* v) {
     
@@ -516,7 +539,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // set up "antiAliased" button
-    m_antiAliasedButton = new Fl_Button(330, 190, 110, 25, "&Anti-aliased");
+    m_antiAliasedButton = new Fl_Button(330, 220, 110, 25, "&Anti-aliased");
     m_antiAliasedButton->user_data((void*)(this));
     m_antiAliasedButton->callback(cb_antiAliased);
     
@@ -524,13 +547,13 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // Add multi Threads button
-    m_multiThreadsLightButton = new Fl_Light_Button(330,220,110,25,"&Multi Threads");
+    m_multiThreadsLightButton = new Fl_Light_Button(330,190,110,25,"&Multi Threads");
     m_multiThreadsLightButton->user_data((void*)(this));   // record self to be used by static callback functions
     m_multiThreadsLightButton->callback(cb_multiThreadsLightButton);
     
     
     // Add multi Threads button
-    m_jitteredSupersampleLightButton = new Fl_Light_Button(330,280,110,25,"&jittered Supersample");
+    m_jitteredSupersampleLightButton = new Fl_Light_Button(290,250,150,25,"&jittered Supersample");
     m_jitteredSupersampleLightButton->user_data((void*)(this));   // record self to be used by static callback functions
     m_jitteredSupersampleLightButton->callback(cb_jitteredSupersampleLightButton);
     
@@ -593,7 +616,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install sampling slider
-    m_samplingSlider = new Fl_Value_Slider(10, 190, 180, 20, "Samples number");
+    m_samplingSlider = new Fl_Value_Slider(10, 220, 180, 20, "Samples number");
     m_samplingSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_samplingSlider->type(FL_HOR_NICE_SLIDER);
     m_samplingSlider->labelfont(FL_COURIER);
@@ -623,7 +646,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install multiThreads slider
-    m_multiThreadsSlider = new Fl_Value_Slider(10, 220, 180, 20, "threads number");
+    m_multiThreadsSlider = new Fl_Value_Slider(10, 190, 180, 20, "threads number");
     m_multiThreadsSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_multiThreadsSlider->type(FL_HOR_NICE_SLIDER);
     m_multiThreadsSlider->labelfont(FL_COURIER);
@@ -637,7 +660,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install multiThreads slider
-    m_treeDepthSlider = new Fl_Value_Slider(100, 270, 180, 20, "kd tree depth");
+    m_treeDepthSlider = new Fl_Value_Slider(100, 290, 180, 20, "kd tree depth");
     m_treeDepthSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_treeDepthSlider->type(FL_HOR_NICE_SLIDER);
     m_treeDepthSlider->labelfont(FL_COURIER);
@@ -651,7 +674,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_treeDepthSlider->deactivate();
     
     // install multiThreads slider
-    m_leafSizeSlider = new Fl_Value_Slider(100, 290, 180, 20, "kd tree leave size");
+    m_leafSizeSlider = new Fl_Value_Slider(100, 310, 180, 20, "kd tree leave size");
     m_leafSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_leafSizeSlider->type(FL_HOR_NICE_SLIDER);
     m_leafSizeSlider->labelfont(FL_COURIER);
@@ -666,7 +689,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // kd tree check box
-    m_kdCheckButton = new Fl_Check_Button(10, 275, 80, 20, "Kd Tree");
+    m_kdCheckButton = new Fl_Check_Button(10, 295, 80, 20, "Kd Tree");
     m_kdCheckButton->user_data((void*)(this));
     m_kdCheckButton->callback(cb_kdCheckButton);
     m_kdCheckButton->value(m_kdInfo);
@@ -685,7 +708,11 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_cubeMapCheckButton->value(m_cubeMapInfo);
     
     
-    
+    // set up debugging display checkbox
+    m_grCheckButton = new Fl_Check_Button(200, 400, 140, 20, "glossy reflection");
+    m_grCheckButton->user_data((void*)(this));
+    m_grCheckButton->callback(cb_grCheckButton);
+    m_grCheckButton->value(m_grInfo);
     
 
 	m_mainWindow->callback(cb_exit2);

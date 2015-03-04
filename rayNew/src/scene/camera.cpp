@@ -23,13 +23,10 @@ Camera::rayThrough(double x, double y, ray &r)
 // the camera's x and y vary both vary from 0 to 1.
 {
     
-    
-    
     x -= 0.5;
     y -= 0.5;
     
     Vec3d dir = look + x * u + y * v;
-
     
 	dir.normalize();
 	r.p = eye;

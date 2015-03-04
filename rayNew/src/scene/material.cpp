@@ -45,7 +45,6 @@ Vec3d Material::shade(Scene *scene, const ray& r, const isect& i) const
     Vec3d q = r.at(i.t);
     Vec3d I = ke(i);
     
-    bool semiTransparent = false;   //////modify
     
     if (Trans()) {
         
@@ -68,6 +67,7 @@ Vec3d Material::shade(Scene *scene, const ray& r, const isect& i) const
         //   double NLv = NL[0] + NL[1] + NL[2];
         double NLv = N * L;
         Vec3d diffuseTerm = kd(i) * fmax(0, NLv);
+        
         
         //specular reflection
         Vec3d R = N * 2* NLv - L;
