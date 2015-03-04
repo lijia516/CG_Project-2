@@ -125,8 +125,8 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
             return colorC;
         }
         
-        std::cout <<"colorC"<<colorC[0]<<","<<colorC[1]<<","<<colorC[2]<<"\n";
-        std::cout << TraceUI::m_nThreshold<<"\n";
+      //  std::cout <<"colorC"<<colorC[0]<<","<<colorC[1]<<","<<colorC[2]<<"\n";
+       // std::cout << TraceUI::m_nThreshold<<"\n";
         
         
         if (colorC[0] < TraceUI::m_nThreshold && colorC[1] < TraceUI::m_nThreshold && colorC[2] < TraceUI::m_nThreshold) {
@@ -146,18 +146,13 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         Vec3d R = i.N * 2* NVv - V;
         
         
-        double dx = (static_cast<double>(rand() % 10) / 100) - 0.05f;
-        double dy = (static_cast<double>(rand() % 10) / 100) - 0.05f;
-        double dz = (static_cast<double>(rand() % 10) / 100) - 0.05f;
         
-        std::cout <<"d"<<dx<<","<<dy<<","<<dz<<"\n";
-        
+        double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+        double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+        double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
         
         R += Vec3d(dx, dy, dz);
-        
-        
-        
-        
+
         
         
         ray new_r = ray(r.at(i.t), R, ray::VISIBILITY);
@@ -323,7 +318,7 @@ void RayTracer::antiAliased(int sampling, int i, int j) {
             for (int j = 0; j < size; j++) {
                 
                 color += trace(x + ((i + (-size / 2)) * 1.0 /size * x_gap), y + ((j + (-size / 2)) * 1.0 /size * y_gap));
-                std::cout <<"color"<<color[0]<<","<<color[1]<<","<<color[2]<<"\n";
+               // std::cout <<"color"<<color[0]<<","<<color[1]<<","<<color[2]<<"\n";
             }
         }
         
