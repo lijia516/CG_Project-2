@@ -96,8 +96,9 @@ void Trimesh::buildKdTree(){
 void KdTreeTM::buildTree(KDNodeTM *node, int depth){
 		
     
+    cout<<"leave, depth " << TraceUI::m_nKdLeaves <<","<< TraceUI::m_nKdDepth<<"\n";
     
-    if(node->faces.size() <= 3 || depth == 10){
+    if(node->faces.size() <= TraceUI::m_nKdLeaves || depth == TraceUI::m_nKdDepth){
         return;
     }
     

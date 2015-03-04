@@ -100,11 +100,15 @@ private:
     static void cb_samplingSlides(Fl_Widget* o, void* v);
     static void cb_filterSlides(Fl_Widget* o, void* v);
     static void cb_multiThreadsSlides(Fl_Widget* o, void* v);
+    static void cb_kdDepthSlides(Fl_Widget* o, void* v);
+    static void cb_kdLeavesSlides(Fl_Widget* o, void* v);
+    
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);
     static void cb_antiAliased(Fl_Widget* o, void* v);
 	static void cb_debuggingDisplayCheckButton(Fl_Widget* o, void* v);
+    static void cb_kdCheckButton(Fl_Widget* o, void* v);
     static void cb_cubeMapCheckButton(Fl_Widget* o, void* v);
 	static void cb_ssCheckButton(Fl_Widget* o, void* v);
 	static void cb_shCheckButton(Fl_Widget* o, void* v);

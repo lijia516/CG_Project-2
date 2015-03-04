@@ -31,6 +31,9 @@ GraphicalUI* GraphicalUI::pUI = NULL;
 char* GraphicalUI::traceWindowLabel = "Raytraced Image";
 bool TraceUI::m_debug = false;
 bool TraceUI::m_cubeMap = false;
+bool TraceUI::m_kd = false;
+int TraceUI::m_nKdDepth = 10;
+int TraceUI::m_nKdLeaves = 3;
 
 
 static int gobal_y;
@@ -168,9 +171,39 @@ void GraphicalUI::cb_multiThreadsSlides(Fl_Widget* o, void* v)
 }
 
 
+
+void GraphicalUI::cb_kdDepthSlides(Fl_Widget* o, void* v)
+{
+    ((GraphicalUI*)(o->user_data()))->m_nKdDepth=int( ((Fl_Slider *)o)->value() ) ;
+}
+
+void GraphicalUI::cb_kdLeavesSlides(Fl_Widget* o, void* v)
+{
+    ((GraphicalUI*)(o->user_data()))->m_nKdLeaves=int( ((Fl_Slider *)o)->value() ) ;
+}
+
+
 void GraphicalUI::cb_refreshSlides(Fl_Widget* o, void* v)
 {
 	((GraphicalUI*)(o->user_data()))->refreshInterval=clock_t(((Fl_Slider *)o)->value()) ;
+}
+
+void GraphicalUI::cb_kdCheckButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    pUI->m_kdInfo = (((Fl_Check_Button*)o)->value() == 1);
+    if (pUI->m_kdInfo)
+    {
+        pUI->m_treeDepthSlider->activate();
+        pUI->m_leafSizeSlider->activate();
+        pUI->m_kd = true;
+    }
+    else
+    {
+        pUI->m_treeDepthSlider->deactivate();
+        pUI->m_leafSizeSlider->deactivate();
+        pUI->m_kd = false;
+    }
 }
 
 void GraphicalUI::cb_debuggingDisplayCheckButton(Fl_Widget* o, void* v)
@@ -546,7 +579,43 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_multiThreadsSlider->align(FL_ALIGN_RIGHT);
     m_multiThreadsSlider->callback(cb_multiThreadsSlides);
     
-
+    
+    // install multiThreads slider
+    m_treeDepthSlider = new Fl_Value_Slider(100, 220, 180, 20, "kd tree depth");
+    m_treeDepthSlider->user_data((void*)(this));	// record self to be used by static callback functions
+    m_treeDepthSlider->type(FL_HOR_NICE_SLIDER);
+    m_treeDepthSlider->labelfont(FL_COURIER);
+    m_treeDepthSlider->labelsize(12);
+    m_treeDepthSlider->minimum(1);
+    m_treeDepthSlider->maximum(30);
+    m_treeDepthSlider->step(1);
+    m_treeDepthSlider->value(m_nKdDepth);
+    m_treeDepthSlider->align(FL_ALIGN_RIGHT);
+    m_treeDepthSlider->callback(cb_kdDepthSlides);
+    m_treeDepthSlider->deactivate();
+    
+    // install multiThreads slider
+    m_leafSizeSlider = new Fl_Value_Slider(100, 250, 180, 20, "kd tree leave size");
+    m_leafSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
+    m_leafSizeSlider->type(FL_HOR_NICE_SLIDER);
+    m_leafSizeSlider->labelfont(FL_COURIER);
+    m_leafSizeSlider->labelsize(12);
+    m_leafSizeSlider->minimum(1);
+    m_leafSizeSlider->maximum(10);
+    m_leafSizeSlider->step(1);
+    m_leafSizeSlider->value(m_nKdLeaves);
+    m_leafSizeSlider->align(FL_ALIGN_RIGHT);
+    m_leafSizeSlider->callback(cb_kdLeavesSlides);
+    m_leafSizeSlider->deactivate();
+    
+    
+    // kd tree check box
+    m_kdCheckButton = new Fl_Check_Button(10, 230, 80, 20, "Kd Tree");
+    m_kdCheckButton->user_data((void*)(this));
+    m_kdCheckButton->callback(cb_kdCheckButton);
+    m_kdCheckButton->value(m_kdInfo);
+    
+    
 	// set up debugging display checkbox
 	m_debuggingDisplayCheckButton = new Fl_Check_Button(10, 429, 140, 20, "Debugging display");
 	m_debuggingDisplayCheckButton->user_data((void*)(this));
@@ -558,6 +627,10 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_cubeMapCheckButton->user_data((void*)(this));
     m_cubeMapCheckButton->callback(cb_cubeMapCheckButton);
     m_cubeMapCheckButton->value(m_cubeMapInfo);
+    
+    
+    
+    
 
 	m_mainWindow->callback(cb_exit2);
 	m_mainWindow->when(FL_HIDE);

@@ -50,6 +50,10 @@ public:
 
 	static bool m_debug;
     static bool m_cubeMap;
+    static bool m_kd;
+    
+    static int	m_nKdDepth;	// number of samples
+    static int  m_nKdLeaves;
     
     bool		m_usingCubeMap;  // render with cubemap
     bool		m_gotCubeMap;  // cubemap defined
@@ -62,12 +66,14 @@ protected:
     int	m_nSampling;	// number of samples
     int	m_nFilter;	// number of samples
     int	m_nMultiThreads;	// number of samples
+    
 
 	// Determines whether or not to show debugging information
 	// for individual rays.  Disabled by default for efficiency
 	// reasons.
 	bool m_displayDebuggingInfo;
     bool m_cubeMapInfo;
+    bool m_kdInfo;
 	bool m_shadows;  // compute shadows?
 	bool m_smoothshade;  // turn on/off smoothshading?
    
