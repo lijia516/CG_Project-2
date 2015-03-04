@@ -35,6 +35,7 @@ bool TraceUI::m_kd = false;
 int TraceUI::m_nKdDepth = 10;
 int TraceUI::m_nKdLeaves = 3;
 double TraceUI::m_nThreshold = 0;
+bool TraceUI::m_hasJitteredSupersample = false;
 
 
 static int gobal_y;
@@ -134,6 +135,25 @@ void GraphicalUI::cb_multiThreadsLightButton(Fl_Widget* o, void* v)
     
     std::cout << "multi threads: " << pUI->m_hasMultiThreads << "\n";
 }
+
+
+
+
+void GraphicalUI::cb_jitteredSupersampleLightButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    
+    if (pUI->m_hasJitteredSupersample==true) pUI->m_hasJitteredSupersample=false;
+    
+    else {
+        
+        pUI->m_hasJitteredSupersample=true;
+        
+    }
+    
+    std::cout << "Jittered Supersample: " << pUI->m_hasJitteredSupersample << "\n";
+}
+
 
 
 void GraphicalUI::cb_sizeSlides(Fl_Widget* o, void* v)
@@ -508,6 +528,11 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_multiThreadsLightButton->user_data((void*)(this));   // record self to be used by static callback functions
     m_multiThreadsLightButton->callback(cb_multiThreadsLightButton);
     
+    
+    // Add multi Threads button
+    m_jitteredSupersampleLightButton = new Fl_Light_Button(330,280,110,25,"&jittered Supersample");
+    m_jitteredSupersampleLightButton->user_data((void*)(this));   // record self to be used by static callback functions
+    m_jitteredSupersampleLightButton->callback(cb_jitteredSupersampleLightButton);
     
 
 	// install depth slider

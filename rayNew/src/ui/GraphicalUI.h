@@ -60,6 +60,7 @@ public:
     Fl_Button*			m_antiAliasedButton;
     
     Fl_Light_Button*    m_multiThreadsLightButton;
+    Fl_Light_Button*    m_jitteredSupersampleLightButton;
 
 	CubeMapChooser*     m_cubeMapChooser;
 
@@ -116,7 +117,8 @@ private:
 	static void cb_bfCheckButton(Fl_Widget* o, void* v);
     
     static void cb_multiThreadsLightButton(Fl_Widget* o, void* v);
-
+    static void cb_jitteredSupersampleLightButton(Fl_Widget* o, void* v);
+    
 	static bool stopTrace;
 	static bool doneTrace;
 	static GraphicalUI* pUI;

@@ -255,12 +255,12 @@ void RayTracer::antiAliased(int sampling, int i, int j) {
     Vec3d color(0,0,0);
     
     
-    if (false) {
+    if (TraceUI::m_hasJitteredSupersample) {
         
         color = trace( x,y );
         
         for (int i = 1; i < sampling; i++) {
-            color += trace( x + (rand() % 10 * 1.0 / 10) * x_gap, y + (rand() % 10 * 1.0 / 10) * y_gap);
+            color += trace( x + (rand() % (sampling / 2 + 1) * 1.0 / (sampling * 1.0 / 2) * pow(-1, rand() % 2) ) * x_gap, y + (rand() % (sampling / 2 + 1) * 1.0 / (sampling * 1.0 / 2) * pow(-1, rand() % 2)) * y_gap);
         }
         
         color /= sampling;
