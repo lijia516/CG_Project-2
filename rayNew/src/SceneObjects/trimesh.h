@@ -9,26 +9,22 @@
 #include "../scene/scene.h"
 
 class TrimeshFace;
-class KDNodeTM{
+class KdNode_tm{
 		public:
-		KDNodeTM();
+        KdNode_tm(){}
 			BoundingBox node_bounds;
-			KDNodeTM * left = NULL;
-			KDNodeTM * right = NULL;
+			KdNode_tm * left = NULL;
+			KdNode_tm * right = NULL;
 			std::vector<TrimeshFace*> faces;
             int axis;
             double mid;
 };
-class KdTreeTM{
+class KdTree_tm{
 		public:
-        KdTreeTM() { root = new KDNodeTM();}
-		KDNodeTM *root;
-		static void buildTree(KDNodeTM *node, int depth);
-		static void searchTree(KDNodeTM *node, ray &r, std::vector<TrimeshFace*> &result);
-		static bool compare0(TrimeshFace *a, TrimeshFace* b);
-		static bool compare1(TrimeshFace *a, TrimeshFace* b);
-		static bool compare2(TrimeshFace *a, TrimeshFace* b);
-        static double getCost(KDNodeTM *node, double pos);
+        KdTree_tm() { root = new KdNode_tm();}
+		KdNode_tm *root;
+		static void splitTree(KdNode_tm *node, int depth);
+		static void searchTree(KdNode_tm *node, ray &r, std::vector<TrimeshFace*> &result);
 };
 
 
@@ -45,7 +41,7 @@ class Trimesh : public MaterialSceneObject
 
 		public:
 		//kd
-		KdTreeTM *kdtree = new KdTreeTM();
+		KdTree_tm *kdtree = new KdTree_tm();
 		void buildKdTree();
 
 		BoundingBox localBounds;

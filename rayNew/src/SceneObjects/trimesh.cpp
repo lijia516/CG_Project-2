@@ -51,22 +51,21 @@ char* Trimesh::doubleCheck()
 		// Check to make sure that if we have per-vertex materials or normals
 		// they are the right number.
 {
-		buildKdTree();
-	//	generateNormals();
+		
 		if( !materials.empty() && materials.size() != vertices.size() )
 				return "Bad Trimesh: Wrong number of materials.";
 		if( !normals.empty() && normals.size() != vertices.size() )
 				return "Bad Trimesh: Wrong number of normals.";
 
+        buildKdTree();
 		return 0;
 }
 
 
 void Trimesh::buildKdTree(){
-		//printf("Building Mesh KD tree...\n");
     
-		kdtree = new KdTreeTM();
-        KDNodeTM* root = kdtree->root;
+		kdtree = new KdTree_tm();
+        KdNode_tm* root = kdtree->root;
 		root->faces = faces;
 
 		typedef Faces::const_iterator iter;
@@ -75,23 +74,17 @@ void Trimesh::buildKdTree(){
 				root->node_bounds.merge((*j)->getBoundingBox());
 		}
 
-		kdtree->buildTree(root, 0);
-    
-		//printf("Done!\n");
+		kdtree->splitTree(root, 0);
+
 		return;
 }
 
-void KdTreeTM::buildTree(KDNodeTM *node, int depth){
-		
-    
-    cout<<"leave, depth " << TraceUI::m_nKdLeaves <<","<< TraceUI::m_nKdDepth<<"\n";
+void KdTree_tm::splitTree(KdNode_tm *node, int depth){
     
     if(node->faces.size() <= TraceUI::m_nKdLeaves || depth == TraceUI::m_nKdDepth){
         return;
     }
     
-    
-    cout<<"depth, size " << depth <<","<< node->faces.size()<<"\n";
     typedef vector<TrimeshFace*>::const_iterator iter;
 
     node->axis = node->node_bounds.longestAxis();
@@ -106,17 +99,17 @@ void KdTreeTM::buildTree(KDNodeTM *node, int depth){
     
         node->mid = mid;
  
-		node->left = new KDNodeTM();
-		node->right = new KDNodeTM();
+		node->left = new KdNode_tm();
+		node->right = new KdNode_tm();
     
         typedef vector<TrimeshFace*>::const_iterator iter;
 
 		for(iter j = node->faces.begin(); j != node->faces.end(); ++j) {
-				if((*j)->getBoundingBox().getMax()[node->axis] >= node->mid){//right
+				if((*j)->getBoundingBox().getMax()[node->axis] >= node->mid){
 						node->right->faces.push_back(*j);
                         node->right->node_bounds.merge((*j)->getBoundingBox());
 				}
-                else if((*j)->getBoundingBox().getMin()[node->axis] <= node->mid ){//left
+                else if((*j)->getBoundingBox().getMin()[node->axis] <= node->mid ){
 						node->left->faces.push_back(*j);
                         node->left->node_bounds.merge((*j)->getBoundingBox());
 				}
@@ -135,40 +128,36 @@ void KdTreeTM::buildTree(KDNodeTM *node, int depth){
     
     if (((match*1.0 / node->left->faces.size()) < 0.5) || ((match * 1.0 / node->right->faces.size()) < 0.5)){
 
-		buildTree(node->right,  depth + 1);
-		buildTree(node->left, depth + 1);
+		splitTree(node->right,  depth + 1);
+		splitTree(node->left, depth + 1);
 		return;
     }
 }
 
 
-KDNodeTM::KDNodeTM(){
-}
-
-//dfs
-void KdTreeTM::searchTree(KDNodeTM *node, ray &r, std::vector<TrimeshFace*> &result){
+void KdTree_tm::searchTree(KdNode_tm *node, ray &r, std::vector<TrimeshFace*> &result){
 		
-
     double tMax = 100;
     double tMin = 0;
+    
     if (node->node_bounds.intersect(r, tMin, tMax)) {
     
     
         typedef vector<TrimeshFace*>::const_iterator iter;
-        if(node->right == NULL && node->left == NULL){//leaf
+        
+        if(node->left == NULL && node->right == NULL){
             for(iter j = node->faces.begin(); j != node->faces.end(); ++j)
                 result.push_back(*j);
             return;
         }
         
-		double tTMP = 100;
-		if(node->right != NULL && node->right->faces.size() != 0 && node->right->node_bounds.intersect(r, tTMP, tTMP)){
+        if(node->left->faces.size() != 0 && node->left->node_bounds.intersect(r, tMin, tMax)){
+            searchTree(node->left, r, result);
+        }
+        
+		if(node->right->faces.size() != 0 && node->right->node_bounds.intersect(r, tMin, tMax)){
 				searchTree(node->right, r, result);
 		}
-
-		if(node->left != NULL && node->right->faces.size() != 0 && node->left->node_bounds.intersect(r, tTMP, tTMP)){
-				searchTree(node->left, r, result);
-        }
     }
 }
 
@@ -181,12 +170,10 @@ bool Trimesh::intersectLocal(ray& r, isect& i) const
 		typedef Faces::const_iterator iter;
 		bool have_one = false;
 
-		//kdTree!!
-		std::vector<TrimeshFace*> result;
-		kdtree->searchTree(kdtree->root, r, result);
+		std::vector<TrimeshFace*> node_faces;
+		kdtree->searchTree(kdtree->root, r, node_faces);
 
-		//printf("%d -> %d\n", faces.size(),result.size());
-		for( iter j = result.begin(); j != result.end(); ++j )
+		for( iter j = node_faces.begin(); j != node_faces.end(); ++j )
         //for( iter j = faces.begin(); j != faces.end(); ++j )
 		{
 				isect cur;
