@@ -45,6 +45,7 @@ public:
     Vec3d adaptive_antiAliased ( double x, double  y , double  x_gap, double  y_gap, int dir, Vec3d col_ld, Vec3d temp_col_rd, Vec3d temp_col_lu, Vec3d temp_col_ru);
     
     static int aa_depth_total;
+    Vec3d traceRay_DOF(ray& r, double x, double y);
     
 
 public:

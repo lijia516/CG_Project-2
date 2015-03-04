@@ -41,40 +41,56 @@ Vec3d RayTracer::trace(double x, double y)
   ray r(Vec3d(0,0,0), Vec3d(0,0,0), ray::VISIBILITY);
   
     
-    if (!TraceUI::m_glossyRefection) {
-        
-        scene->getCamera().rayThrough(x,y,r);
-        Vec3d ret = traceRay(r, traceUI->getDepth());
-        ret.clamp();
-        return ret;
-    }
+     Vec3d ret(0,0,0);
     
-    
-    Vec3d ret(0,0,0);
-
-    
-    for (int i = 0; i < 16; i++) {
+    if (false) {
         
-        scene->getCamera().rayThrough(x,y,r);
-        
-        
-        
-        double dx = (static_cast<double>(rand() % 10) / 5000) - 0.001f;
-        double dy = (static_cast<double>(rand() % 10) / 5000) - 0.001f;
        
-        r.p += Vec3d(dx, dy, 0);
-        r.d -= Vec3d(dx, dy, 0);
+        for (int i = 0; i < 16; i++) {
+            
+            scene->getCamera().rayThrough(x,y,r);
+            
+            
+            
+            double dx = (static_cast<double>(rand() % 10) / 5000) - 0.001f;
+            double dy = (static_cast<double>(rand() % 10) / 5000) - 0.001f;
+            
+            r.p += Vec3d(dx, dy, 0);
+            r.d -= Vec3d(dx, dy, 0);
+            
+            
+            Vec3d color = traceRay(r, traceUI->getDepth());
+            
+            color.clamp();
+            
+            ret += color ;
+        }
         
         
-        Vec3d color = traceRay(r, traceUI->getDepth());
+        ret = ret / 16;
         
-        color.clamp();
+       
+    } else if (TraceUI::m_glossyRefection) {
         
-        ret += color ;
+     //   cout << "DOF\n";
+        
+         scene->getCamera().rayThrough(x,y,r);
+        
+         ret = traceRay_DOF(r, x, y);
+        
+        
+        
+        
+        
+    } else {
+        
+        scene->getCamera().rayThrough(x,y,r);
+        ret = traceRay(r, traceUI->getDepth());
+       
     }
     
     
-    ret = ret / 16;
+  ret.clamp();
   
   return ret;
 }
@@ -100,6 +116,68 @@ Vec3d RayTracer::tracePixel(int i, int j)
 }
 
 
+Vec3d RayTracer::traceRay_DOF(ray& r, double x, double y) {
+    
+    isect i;
+    Vec3d ret(0,0,0);
+    
+   // cout << "in DOF\n";
+    
+    if (scene->intersect(r,i)) {
+        
+         cout << "has intersect\n";
+        
+        Vec3d eye = scene->getCamera().getEye();
+        Vec3d pos = r.at(i.t);
+        
+        cout<<(eye - pos).length()<<"\n";
+        
+        if ((eye - pos).length() > 50) {
+            
+            cout << ">> \n";
+            
+            
+            for (int i = 0; i < 16; i++) {
+                
+                
+                double dx = (static_cast<double>(rand() % 10) / 500) - 0.01f;
+                double dy = (static_cast<double>(rand() % 10) / 500) - 0.01f;
+                
+                r.p += Vec3d(dx, dy, 0);
+                r.d -= Vec3d(dx, dy, 0);
+                
+                Vec3d color = traceRay(r, traceUI->getDepth());
+                
+                color.clamp();
+                
+                ret += color ;
+            }
+            
+            
+            ret = ret / 16;
+            
+        } else {
+            
+              cout << "<< \n";
+          
+              ret = traceRay(r, traceUI->getDepth());
+            
+        }
+
+    } else {
+        
+       //   cout << "do not have intersect\n";
+        
+        ret = traceRay(r, traceUI->getDepth());
+        
+    }
+    
+    ret.clamp();
+    return ret;
+    
+}
+
+
 // Do recursive ray tracing!  You'll want to insert a lot of code here
 // (or places called from here) to handle reflection, refraction, etc etc.
 Vec3d RayTracer::traceRay(ray& r, int depth)
@@ -121,6 +199,21 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
 	  //const Material& m = i.getMaterial();
 	  //colorC = m.shade(scene, r, i);
         
+        
+        
+        
+      //  if (TraceUI::m_glossyRefection) {
+            
+            
+      //      double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+      //      double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+      //      double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+            
+      //      i.N += Vec3d(dx, dy, dz);
+            
+       // }
+        
+
       
         const Material& m = i.getMaterial();
         colorC = m.shade(scene, r, i);
@@ -145,32 +238,8 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         Vec3d R = i.N * 2* NVv - V;
         
         
-        if (TraceUI::m_glossyRefection) {
-            
-            
-            double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-            double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-            double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-            
-            R += Vec3d(dx, dy, dz);
-
-            
-        }
+       
         
-        
-    //    Vec3d eye = scene->getCamera().getEye();
-    //    Vec3d pos = r.at(i.t);
-        
-     //   if ((eye - pos).length() > 0.5) {
-        
-        
-    //        double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-    //        double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-    //        double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-        
-    //        R += Vec3d(dx, dy, dz);
-
-    //    }
         
         ray new_r = ray(r.at(i.t), R, ray::VISIBILITY);
         Vec3d a = m.kr(i) % traceRay(new_r,depth - 1);
