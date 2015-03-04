@@ -55,6 +55,8 @@ public:
     static int	m_nKdDepth;	// number of samples
     static int  m_nKdLeaves;
     
+    static double m_nThreshold;
+    
     bool		m_usingCubeMap;  // render with cubemap
     bool		m_gotCubeMap;  // cubemap defined
 

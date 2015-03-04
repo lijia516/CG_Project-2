@@ -102,6 +102,7 @@ private:
     static void cb_multiThreadsSlides(Fl_Widget* o, void* v);
     static void cb_kdDepthSlides(Fl_Widget* o, void* v);
     static void cb_kdLeavesSlides(Fl_Widget* o, void* v);
+    static void cb_thresholdSlides(Fl_Widget* o, void* v);
     
 
 	static void cb_render(Fl_Widget* o, void* v);

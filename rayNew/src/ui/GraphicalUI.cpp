@@ -34,6 +34,7 @@ bool TraceUI::m_cubeMap = false;
 bool TraceUI::m_kd = false;
 int TraceUI::m_nKdDepth = 10;
 int TraceUI::m_nKdLeaves = 3;
+double TraceUI::m_nThreshold = 0;
 
 
 static int gobal_y;
@@ -188,6 +189,15 @@ void GraphicalUI::cb_refreshSlides(Fl_Widget* o, void* v)
 	((GraphicalUI*)(o->user_data()))->refreshInterval=clock_t(((Fl_Slider *)o)->value()) ;
 }
 
+
+void GraphicalUI::cb_thresholdSlides(Fl_Widget* o, void* v)
+{
+    ((GraphicalUI*)(o->user_data()))->m_nThreshold=clock_t(((Fl_Slider *)o)->value()) ;
+}
+
+
+
+
 void GraphicalUI::cb_kdCheckButton(Fl_Widget* o, void* v)
 {
     pUI=(GraphicalUI*)(o->user_data());
@@ -236,6 +246,9 @@ void GraphicalUI::cb_cubeMapCheckButton(Fl_Widget* o, void* v)
         pUI->m_cubeMapChooser->hide();
         pUI->m_cubeMap = false;
     }
+    
+    
+    std::cout << "m_cubeMap: " << pUI->m_cubeMap << "\n";
 }
 
 void GraphicalUI::cb_render(Fl_Widget* o, void* v) {
@@ -482,7 +495,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // set up "antiAliased" button
-    m_antiAliasedButton = new Fl_Button(330, 125, 110, 25, "&Anti-aliased");
+    m_antiAliasedButton = new Fl_Button(330, 190, 110, 25, "&Anti-aliased");
     m_antiAliasedButton->user_data((void*)(this));
     m_antiAliasedButton->callback(cb_antiAliased);
     
@@ -490,7 +503,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // Add multi Threads button
-    m_multiThreadsLightButton = new Fl_Light_Button(330,160,110,25,"&Multi Threads");
+    m_multiThreadsLightButton = new Fl_Light_Button(330,220,110,25,"&Multi Threads");
     m_multiThreadsLightButton->user_data((void*)(this));   // record self to be used by static callback functions
     m_multiThreadsLightButton->callback(cb_multiThreadsLightButton);
     
@@ -536,8 +549,25 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
 	m_refreshSlider->callback(cb_refreshSlides);
     
     
+    
+    
+    // install refresh interval slider
+    m_thresholdSlider = new Fl_Value_Slider(10, 160, 180, 20, "daptive termination threshold");
+    m_thresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
+    m_thresholdSlider->type(FL_HOR_NICE_SLIDER);
+    m_thresholdSlider->labelfont(FL_COURIER);
+    m_thresholdSlider->labelsize(12);
+    m_thresholdSlider->minimum(0);
+    m_thresholdSlider->maximum(0.5);
+    m_thresholdSlider->step(0.05);
+    m_thresholdSlider->value(m_nThreshold);
+    m_thresholdSlider->align(FL_ALIGN_RIGHT);
+    m_thresholdSlider->callback(cb_thresholdSlides);
+    
+    
+    
     // install sampling slider
-    m_samplingSlider = new Fl_Value_Slider(10, 125, 180, 20, "Samples number");
+    m_samplingSlider = new Fl_Value_Slider(10, 190, 180, 20, "Samples number");
     m_samplingSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_samplingSlider->type(FL_HOR_NICE_SLIDER);
     m_samplingSlider->labelfont(FL_COURIER);
@@ -552,7 +582,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install sampling slider
-    m_filterSlider = new Fl_Value_Slider(10, 180, 180, 20, "filter slider");
+    m_filterSlider = new Fl_Value_Slider(10, 125, 180, 20, "filter slider");
     m_filterSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_filterSlider->type(FL_HOR_NICE_SLIDER);
     m_filterSlider->labelfont(FL_COURIER);
@@ -567,7 +597,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install multiThreads slider
-    m_multiThreadsSlider = new Fl_Value_Slider(10, 160, 180, 20, "threads number");
+    m_multiThreadsSlider = new Fl_Value_Slider(10, 220, 180, 20, "threads number");
     m_multiThreadsSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_multiThreadsSlider->type(FL_HOR_NICE_SLIDER);
     m_multiThreadsSlider->labelfont(FL_COURIER);
@@ -581,7 +611,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install multiThreads slider
-    m_treeDepthSlider = new Fl_Value_Slider(100, 220, 180, 20, "kd tree depth");
+    m_treeDepthSlider = new Fl_Value_Slider(100, 270, 180, 20, "kd tree depth");
     m_treeDepthSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_treeDepthSlider->type(FL_HOR_NICE_SLIDER);
     m_treeDepthSlider->labelfont(FL_COURIER);
@@ -595,7 +625,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_treeDepthSlider->deactivate();
     
     // install multiThreads slider
-    m_leafSizeSlider = new Fl_Value_Slider(100, 250, 180, 20, "kd tree leave size");
+    m_leafSizeSlider = new Fl_Value_Slider(100, 290, 180, 20, "kd tree leave size");
     m_leafSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_leafSizeSlider->type(FL_HOR_NICE_SLIDER);
     m_leafSizeSlider->labelfont(FL_COURIER);
@@ -610,7 +640,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // kd tree check box
-    m_kdCheckButton = new Fl_Check_Button(10, 230, 80, 20, "Kd Tree");
+    m_kdCheckButton = new Fl_Check_Button(10, 275, 80, 20, "Kd Tree");
     m_kdCheckButton->user_data((void*)(this));
     m_kdCheckButton->callback(cb_kdCheckButton);
     m_kdCheckButton->value(m_kdInfo);
