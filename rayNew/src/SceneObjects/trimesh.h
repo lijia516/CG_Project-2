@@ -28,6 +28,7 @@ class KdTreeTM{
 		static bool compare0(TrimeshFace *a, TrimeshFace* b);
 		static bool compare1(TrimeshFace *a, TrimeshFace* b);
 		static bool compare2(TrimeshFace *a, TrimeshFace* b);
+        static double getCost(KDNodeTM *node, double pos);
 };
 
 

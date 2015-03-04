@@ -130,11 +130,13 @@ void Scene::buildKdTree(){
 
 
 void KdTree::buildTree(KDNode *node, int depth){
-    printf("Scene KD depth- size:%d - %d\n", depth, node->objects.size());
+ //   printf("Scene KD depth- size:%d - %d\n", depth, node->objects.size());
     if(node->objects.size() <= 1 || depth == 10)
         return;
     
     typedef vector<Geometry*>::const_iterator iter;
+    
+    double len;
     
     node->axis = node->node_bounds.longestAxis();
     

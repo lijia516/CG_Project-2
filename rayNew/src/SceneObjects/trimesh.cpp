@@ -83,83 +83,92 @@ void Trimesh::buildKdTree(){
 
 		typedef Faces::const_iterator iter;
 		for(iter j = faces.begin(); j != faces.end(); ++j) {
-				//printf("TMB %f\n",(*j)->getBoundingBox().getMin()[0]);
+            
 				root->node_bounds.merge((*j)->getBoundingBox());
 		}
 
 		kdtree->buildTree(root, 0);
+    
 		//printf("Done!\n");
 		return;
 }
 
 void KdTreeTM::buildTree(KDNodeTM *node, int depth){
-		printf("KD depth- size:%d - %d\n", depth, node->faces.size());
-		if(node->faces.size() <= 1 || depth == 10)
-				return;
-
-		typedef vector<TrimeshFace*>::const_iterator iter;
-
-		node->axis = node->node_bounds.longestAxis();
+		
     
-        typedef vector<TrimeshFace*>::const_iterator iter;
     
-		switch(node->axis){
-				case 0:
-						std::sort(node->faces.begin(), node->faces.end(), compare0);
-						break;
-				case 1:
-						std::sort(node->faces.begin(), node->faces.end(), compare1);
-						break;
-				case 2:
-						std::sort(node->faces.begin(), node->faces.end(), compare2);
-						break;
-		}
+    if(node->faces.size() <= 3 || depth == 10){
+        return;
+    }
+    
+    
+    cout<<"depth, size " << depth <<","<< node->faces.size()<<"\n";
+    typedef vector<TrimeshFace*>::const_iterator iter;
 
-		node->mid = node->faces[node->faces.size()/2]->getBoundingBox().getMin()[node->axis];
-
-		//find the cutting plane
-		/*
-		   double mid = 0;
-		   for(iter j = faces.begin(); j != faces.end(); ++j) {
-		   mid += (*j)->getBoundingBox().getMin()[dimension];
-		   }
-
-		   mid /= faces.size();
-		 */
+    node->axis = node->node_bounds.longestAxis();
+    
+    double mid = 0;
+    typedef vector<TrimeshFace*>::const_iterator iter;
+    for(iter j = node->faces.begin(); j != node->faces.end(); ++j) {
+        
+        mid += (((*j)->localbounds.getMax()[node->axis] - (*j)->localbounds.getMin()[node->axis])/2 + (*j)->localbounds.getMin()[node->axis])*1.0 / node->faces.size();
+        
+    }
+    
+        node->mid = mid;
+ 
 		node->left = new KDNodeTM();
 		node->right = new KDNodeTM();
+    
+        typedef vector<TrimeshFace*>::const_iterator iter;
 
 		for(iter j = node->faces.begin(); j != node->faces.end(); ++j) {
 				if((*j)->getBoundingBox().getMax()[node->axis] >= node->mid){//right
 						node->right->faces.push_back(*j);
                         node->right->node_bounds.merge((*j)->getBoundingBox());
-				}else if((*j)->getBoundingBox().getMin()[node->axis] <= node->mid ){//left
+				}
+                else if((*j)->getBoundingBox().getMin()[node->axis] <= node->mid ){//left
 						node->left->faces.push_back(*j);
                         node->left->node_bounds.merge((*j)->getBoundingBox());
-				}else{
-						printf("Error: KdTree split??\n");
 				}
 		}
-
-		
-		//printf("right vs left: %d vs %d\n", node->right->faces.size(), node->left->faces.size());
+    
+    int match = 0;
+    
+    for (int i = 0; i < node->left->faces.size(); i++) {
+        for (int j = 0; j < node->right->faces.size(); j++) {
+            if (node->left->faces[i] == node->right->faces[j]) {
+                match++;
+            }
+        }
+    }
+    
+    
+    if (((match*1.0 / node->left->faces.size()) < 0.5) || ((match * 1.0 / node->right->faces.size()) < 0.5)){
 
 		buildTree(node->right,  depth + 1);
 		buildTree(node->left, depth + 1);
 		return;
+    }
 }
+
 
 //dfs
 void KdTreeTM::searchTree(KDNodeTM *node, ray &r, std::vector<TrimeshFace*> &result){
 		
 
+    double tMax = 100;
+    double tMin = 0;
+    if (node->node_bounds.intersect(r, tMin, tMax)) {
+    
+    
         typedef vector<TrimeshFace*>::const_iterator iter;
         if(node->right == NULL && node->left == NULL){//leaf
             for(iter j = node->faces.begin(); j != node->faces.end(); ++j)
                 result.push_back(*j);
             return;
         }
-    
+        
 		double tTMP = 100;
 		if(node->right != NULL && node->right->faces.size() != 0 && node->right->node_bounds.intersect(r, tTMP, tTMP)){
 				searchTree(node->right, r, result);
@@ -167,26 +176,8 @@ void KdTreeTM::searchTree(KDNodeTM *node, ray &r, std::vector<TrimeshFace*> &res
 
 		if(node->left != NULL && node->right->faces.size() != 0 && node->left->node_bounds.intersect(r, tTMP, tTMP)){
 				searchTree(node->left, r, result);
-		}
-    
-    
-    
-  //  double tMax = 100;
-  //  double tMin = 0;
-  //  if (node->node_bounds.inters(r, tMin, tMax)) {
-    
-  /*
-        
-        if (node->mid > tMax) searchTree(node->left, r, result);
-        else if (node->mid < tMin) searchTree(node->right, r, result);
-        else {
-             searchTree(node->left, r, result);
-             searchTree(node->right, r, result);
         }
     }
-   
-   */
-    
 }
 
 
