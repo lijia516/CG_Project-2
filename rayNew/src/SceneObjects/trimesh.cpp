@@ -62,18 +62,6 @@ char* Trimesh::doubleCheck()
 }
 
 
-KDNodeTM::KDNodeTM(){
-}
-
-bool KdTreeTM::compare0(TrimeshFace *a, TrimeshFace *b){
-		return a->getBoundingBox().getMin()[0] < b->getBoundingBox().getMin()[0];
-}
-bool KdTreeTM::compare1(TrimeshFace *a, TrimeshFace *b){
-		return a->getBoundingBox().getMin()[1] < b->getBoundingBox().getMin()[1];
-}
-bool KdTreeTM::compare2(TrimeshFace *a, TrimeshFace *b){
-		return a->getBoundingBox().getMin()[2] < b->getBoundingBox().getMin()[2];
-}
 void Trimesh::buildKdTree(){
 		//printf("Building Mesh KD tree...\n");
     
@@ -153,6 +141,9 @@ void KdTreeTM::buildTree(KDNodeTM *node, int depth){
     }
 }
 
+
+KDNodeTM::KDNodeTM(){
+}
 
 //dfs
 void KdTreeTM::searchTree(KDNodeTM *node, ray &r, std::vector<TrimeshFace*> &result){
