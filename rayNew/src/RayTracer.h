@@ -40,6 +40,12 @@ public:
         }
         CubeMap *getCubeMap() {return cubemap;}
         bool haveCubeMap() { return cubemap != 0; }
+    
+    
+    Vec3d adaptive_antiAliased ( double x, double  y , double  x_gap, double  y_gap, int dir, Vec3d col_ld, Vec3d temp_col_rd, Vec3d temp_col_lu, Vec3d temp_col_ru);
+    
+    static int aa_depth_total;
+    
 
 public:
         unsigned char *buffer;

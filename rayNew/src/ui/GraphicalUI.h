@@ -101,6 +101,7 @@ private:
 	static void cb_depthSlides(Fl_Widget* o, void* v);
 	static void cb_refreshSlides(Fl_Widget* o, void* v);
     static void cb_samplingSlides(Fl_Widget* o, void* v);
+    static void cb_aaThreshSlider(Fl_Widget* o, void* v);
     static void cb_filterSlides(Fl_Widget* o, void* v);
     static void cb_multiThreadsSlides(Fl_Widget* o, void* v);
     static void cb_kdDepthSlides(Fl_Widget* o, void* v);
@@ -117,6 +118,7 @@ private:
 	static void cb_ssCheckButton(Fl_Widget* o, void* v);
 	static void cb_shCheckButton(Fl_Widget* o, void* v);
 	static void cb_bfCheckButton(Fl_Widget* o, void* v);
+    static void cb_aaCheckButton(Fl_Widget* o, void* v);
     
     static void cb_grCheckButton(Fl_Widget* o, void* v);
     

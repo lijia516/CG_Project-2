@@ -22,10 +22,12 @@ extern TraceUI* traceUI;
 
 using namespace std;
 
+
 // Use this variable to decide if you want to print out
 // debugging messages.  Gets set in the "trace single ray" mode
 // in TraceGLWindow, for example.
 bool debugMode = false;
+int RayTracer::aa_depth_total = 0;
 
 // Trace a top-level ray through pixel(i,j), i.e. normalized window coordinates (x,y),
 // through the projection plane, and out into the scene.  All we do is
@@ -187,10 +189,6 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         }
         
         
-        
-        
-        
-        
     //    Vec3d eye = scene->getCamera().getEye();
     //    Vec3d pos = r.at(i.t);
         
@@ -242,7 +240,7 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
 		// is just black.
         
         
-        if (m_useCubeMap) colorC = cubemap->getColor(r);
+        if (TraceUI::m_cubeMap) colorC = cubemap->getColor(r);
         else colorC = Vec3d(0, 0, 0);
         
 	}
@@ -357,6 +355,23 @@ void RayTracer::antiAliased(int sampling, int i, int j) {
         
         color /= sampling;
         
+    } else if (TraceUI::m_adaptiveAntiliasing) {
+        
+        
+        Vec3d temp_col_ld (0, 0, 0);
+        Vec3d temp_col_rd (0, 0, 0);
+        Vec3d temp_col_lu (0, 0, 0);
+        Vec3d temp_col_ru (0, 0, 0);
+        
+        color += adaptive_antiAliased ( x, y , x_gap / 2, y_gap / 2, -1, temp_col_ld, temp_col_rd, temp_col_lu, temp_col_ru);
+        color = color / (aa_depth_total+ 1);
+        
+        std::cout <<"color"<<color[0]<<","<<color[1]<<","<<color[2]<<"\n";
+        
+        
+        aa_depth_total = 0;
+    
+    
     } else {
         
         
@@ -368,7 +383,6 @@ void RayTracer::antiAliased(int sampling, int i, int j) {
             for (int j = 0; j < size; j++) {
                 
                 color += trace(x + ((i + (-size / 2)) * 1.0 /size * x_gap), y + ((j + (-size / 2)) * 1.0 /size * y_gap));
-               // std::cout <<"color"<<color[0]<<","<<color[1]<<","<<color[2]<<"\n";
             }
         }
         
@@ -376,11 +390,121 @@ void RayTracer::antiAliased(int sampling, int i, int j) {
         
     }
     
-
-    
-    
     pixel[0] = (int)( 255.0 * color[0]);
     pixel[1] = (int)( 255.0 * color[1]);
     pixel[2] = (int)( 255.0 * color[2]);
 }
+
+
+Vec3d RayTracer::adaptive_antiAliased ( double x, double y , double x_gap, double y_gap, int dir , Vec3d temp_col_ld, Vec3d temp_col_rd, Vec3d temp_col_lu, Vec3d temp_col_ru) {
+    
+    
+ //   std::cout <<"in recursion fun: aa_depth_total"<<aa_depth_total<<"\n";
+    
+ //   std::cout <<"x,y"<<x<<","<<y<<"\n";
+    
+    double center_r = y;
+    double center_c = x;
+    double max_diff = -1;
+    
+    Vec3d col = trace(x, y);
+    
+    if (dir == -1) {
+    
+        temp_col_ld = trace(x - x_gap, y - y_gap);
+        temp_col_rd = trace(x + x_gap, y - y_gap);
+        temp_col_lu = trace(x - x_gap, y + y_gap);
+        temp_col_ru = trace(x + x_gap, y + y_gap);
+        
+    }
+    
+    
+    max_diff = (abs(col[0] - temp_col_ld[0]) + abs(col[1] - temp_col_ld[1]) + abs(col[2] - temp_col_ld[2]));
+    
+    double max_temp1 = (abs(col[0] - temp_col_rd[0]) + abs(col[1] - temp_col_rd[1]) + abs(col[2] - temp_col_rd[2]));
+    double max_temp2 = (abs(col[0] - temp_col_lu[0]) + abs(col[1] - temp_col_lu[1]) + abs(col[2] - temp_col_lu[2]));
+    double max_temp3 = (abs(col[0] - temp_col_ru[0]) + abs(col[1] - temp_col_ru[1]) + abs(col[2] - temp_col_ru[2]));
+    
+    double half_x_gap = x_gap / 2;
+    double half_y_gap = x_gap / 2;
+    
+    double new_max_diff = fmax(max_diff, fmax(max_temp1, fmax(max_temp2, max_temp3)));
+    
+    if (new_max_diff > TraceUI::m_nAaThresh && half_x_gap > 0.0000001 && half_y_gap > 0.0000001) {
+        
+        
+        Vec3d temp_col_ll = trace(x, y - y_gap);
+        Vec3d temp_col_rr = trace(x, y + y_gap);
+        Vec3d temp_col_uu = trace(x + x_gap, y);
+        Vec3d temp_col_dd = trace(x - x_gap, y);
+
+        
+        if (max_diff > TraceUI::m_nAaThresh) {
+            
+                center_c = x - half_x_gap;
+                center_r = y - half_y_gap;
+                
+                col += adaptive_antiAliased ( center_c, center_r , half_x_gap, half_y_gap, 0, temp_col_ld, temp_col_dd, temp_col_ll, col);
+                
+        }
+        
+        if (max_temp2 > TraceUI::m_nAaThresh) {
+    
+                
+                center_c = x + half_x_gap;
+                center_r = y - half_y_gap;
+                
+                col += adaptive_antiAliased ( center_c, center_r , half_x_gap, half_y_gap, 1, temp_col_dd, temp_col_rd, col, temp_col_rr);
+         
+        }
+        
+        if (max_temp2 > TraceUI::m_nAaThresh) {
+            
+                center_c = x - half_x_gap;
+                center_r = y + half_y_gap;
+                col += adaptive_antiAliased ( center_c, center_r , half_x_gap, half_y_gap, 2, temp_col_ll, col, temp_col_lu, temp_col_uu);
+         
+        }
+        
+        if (max_temp3 > TraceUI::m_nAaThresh) {
+    
+                
+                center_c = x + half_x_gap;
+                center_r = y + half_y_gap;
+                col += adaptive_antiAliased ( center_c, center_r , half_x_gap, half_y_gap, 3, col,temp_col_rr, temp_col_uu, temp_col_ru);
+        }
+        
+        
+        if (dir == -1) {
+            
+            col += temp_col_ld;
+            col += temp_col_rd;
+            col += temp_col_lu;
+            col += temp_col_ru;
+            
+            col += temp_col_ll;
+            col += temp_col_rr;
+            col += temp_col_uu;
+            col += temp_col_dd;
+            
+            aa_depth_total += 9;
+            
+        } else {
+            
+            col += temp_col_ll;
+            col += temp_col_rr;
+            col += temp_col_uu;
+            col += temp_col_dd;
+            
+            aa_depth_total += 5;
+        }
+    
+    }
+    
+    
+  //  std::cout <<"finish recursion fun: aa_depth_total"<<aa_depth_total<<"\n";
+    
+    return col;
+}
+
 

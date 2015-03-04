@@ -95,8 +95,6 @@ void CubeMapChooser::cb_cancel(Fl_Widget* o, void* v) {
 void CubeMapChooser::cb_ok(Fl_Widget* o, void* v) {
 	CubeMapChooser* ch = (CubeMapChooser*)(o->parent()->user_data());
     
-    std::cout<< "hello1 " <<"\n";
-    
 	int allGreen = 0;
 	while (ch->fb[allGreen]->selection_color() == FL_GREEN) allGreen++;
     
@@ -123,12 +121,10 @@ void CubeMapChooser::cb_ok(Fl_Widget* o, void* v) {
         
 		ch->caller->setCubeMap(true);
 		ch->caller->useCubeMap(true);
-        ch->caller->getRayTracer()->m_useCubeMap = true;
+        ch->caller->m_cubeMap = true;
 		ch->caller->m_filterSlider->activate();
 		ch->caller->m_cubeMapCheckButton->activate();
 		ch->caller->m_cubeMapCheckButton->value(1);
-        
-        std::cout<< "hello3 " <<"\n";
         
 	}
 	o->parent()->hide();

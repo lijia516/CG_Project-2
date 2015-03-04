@@ -51,13 +51,14 @@ public:
 	static bool m_debug;
     static bool m_cubeMap;
     static bool m_kd;
+    static double m_nAaThresh;
     
     static int	m_nKdDepth;	// number of samples
     static int  m_nKdLeaves;
     
     static bool m_hasJitteredSupersample;
     static bool m_glossyRefection;
-    
+    static bool m_adaptiveAntiliasing;
     
     static double m_nThreshold;
     
@@ -81,6 +82,7 @@ protected:
     bool m_cubeMapInfo;
     bool m_grInfo;
     bool m_kdInfo;
+    bool m_aaInfo;
 	bool m_shadows;  // compute shadows?
 	bool m_smoothshade;  // turn on/off smoothshading?
    
