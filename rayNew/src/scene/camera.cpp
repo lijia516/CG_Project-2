@@ -22,9 +22,15 @@ Camera::rayThrough(double x, double y, ray &r)
 // Ray through normalized window point x,y.  In normalized coordinates
 // the camera's x and y vary both vary from 0 to 1.
 {
+    
+    
+    
     x -= 0.5;
     y -= 0.5;
+    
     Vec3d dir = look + x * u + y * v;
+
+    
 	dir.normalize();
 	r.p = eye;
 	r.d = dir;
