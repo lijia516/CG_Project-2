@@ -93,6 +93,18 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
             return colorC;
         }
         
+        std::cout <<"colorC"<<colorC[0]<<","<<colorC[1]<<","<<colorC[2]<<"\n";
+        std::cout << TraceUI::m_nThreshold<<"\n";
+        
+        
+        if (colorC[0] < TraceUI::m_nThreshold && colorC[1] < TraceUI::m_nThreshold && colorC[2] < TraceUI::m_nThreshold) {
+            
+            std::cout <<"return\n";
+            std::cout <<"colorC"<<colorC[0]<<","<<colorC[1]<<","<<colorC[2]<<"\n";
+            std::cout << TraceUI::m_nThreshold<<"\n";
+            
+            return colorC;
+        }
         
         //////reflection
         Vec3d N = i.N;
@@ -126,6 +138,10 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
             new_r = ray(r.at(i.t), T);
             colorC = colorC + m.kt(i) % traceRay(new_r,depth - 1);
         }
+        
+        
+        
+        
         
         
 	} else {
@@ -236,14 +252,41 @@ void RayTracer::antiAliased(int sampling, int i, int j) {
     unsigned char *pixel = buffer + ( i + j * buffer_width ) * 3;
     
     
-    Vec3d color = trace( x,y );
+    Vec3d color(0,0,0);
     
-    for (int i = 1; i < sampling; i++) {
+    
+    if (false) {
         
-        color += trace( x + (rand() % 10 * 1.0 / 10) * x_gap, y + (rand() % 10 * 1.0 / 10) * y_gap);
+        color = trace( x,y );
+        
+        for (int i = 1; i < sampling; i++) {
+            color += trace( x + (rand() % 10 * 1.0 / 10) * x_gap, y + (rand() % 10 * 1.0 / 10) * y_gap);
+        }
+        
+        color /= sampling;
+        
+    } else {
+        
+        
+        int size = sqrt(sampling);
+        int center_r = size / 2;
+        int center_c = size / 2;
+        
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                
+                color += trace(x + ((i + (-size / 2)) * 1.0 /size * x_gap), y + ((j + (-size / 2)) * 1.0 /size * y_gap));
+                std::cout <<"color"<<color[0]<<","<<color[1]<<","<<color[2]<<"\n";
+            }
+        }
+        
+        color /= (size * size);
+        
     }
     
-    color /= sampling;
+
+    
+    
     pixel[0] = (int)( 255.0 * color[0]);
     pixel[1] = (int)( 255.0 * color[1]);
     pixel[2] = (int)( 255.0 * color[2]);

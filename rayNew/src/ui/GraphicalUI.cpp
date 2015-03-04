@@ -192,7 +192,8 @@ void GraphicalUI::cb_refreshSlides(Fl_Widget* o, void* v)
 
 void GraphicalUI::cb_thresholdSlides(Fl_Widget* o, void* v)
 {
-    ((GraphicalUI*)(o->user_data()))->m_nThreshold=clock_t(((Fl_Slider *)o)->value()) ;
+    ((GraphicalUI*)(o->user_data()))->m_nThreshold=double(((Fl_Slider *)o)->value()) ;
+    std::cout<<"m_nThreshold: "<<m_nThreshold<<"\n";
 }
 
 
@@ -558,8 +559,8 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_thresholdSlider->labelfont(FL_COURIER);
     m_thresholdSlider->labelsize(12);
     m_thresholdSlider->minimum(0);
-    m_thresholdSlider->maximum(0.5);
-    m_thresholdSlider->step(0.05);
+    m_thresholdSlider->maximum(0.2);
+    m_thresholdSlider->step(0.01);
     m_thresholdSlider->value(m_nThreshold);
     m_thresholdSlider->align(FL_ALIGN_RIGHT);
     m_thresholdSlider->callback(cb_thresholdSlides);
