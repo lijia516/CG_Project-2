@@ -39,6 +39,7 @@ bool TraceUI::m_hasJitteredSupersample = false;
 bool TraceUI::m_glossyRefection = false;
 bool TraceUI::m_DOF = false;
 bool TraceUI::m_adaptiveAntiliasing = false;
+bool TraceUI::m_hasReverse = false;
 
 int TraceUI::m_nKdDepth = 10;
 int TraceUI::m_nKdLeaves = 3;
@@ -144,6 +145,23 @@ void GraphicalUI::cb_multiThreadsLightButton(Fl_Widget* o, void* v)
     }
     
     std::cout << "multi threads: " << pUI->m_hasMultiThreads << "\n";
+}
+
+
+
+void GraphicalUI::cb_reverseLightButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    
+    if (pUI->m_hasReverse==true) pUI->m_hasReverse=false;
+    
+    else {
+        
+        pUI->m_hasReverse=true;
+        
+    }
+    
+    std::cout << "reverse: " << pUI->m_hasReverse << "\n";
 }
 
 
@@ -613,6 +631,11 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_multiThreadsLightButton = new Fl_Light_Button(330,190,110,25,"&Multi Threads");
     m_multiThreadsLightButton->user_data((void*)(this));   // record self to be used by static callback functions
     m_multiThreadsLightButton->callback(cb_multiThreadsLightButton);
+    
+    // Add multi Threads button
+    m_reverseLightButton = new Fl_Light_Button(350,310,80,25,"&reverse");
+    m_reverseLightButton->user_data((void*)(this));   // record self to be used by static callback functions
+    m_reverseLightButton->callback(cb_reverseLightButton);
     
     
     // Add multi Threads button

@@ -62,6 +62,7 @@ public:
     static bool m_glossyRefection;
     static bool m_DOF;
     static bool m_adaptiveAntiliasing;
+    static bool m_hasReverse;
     
     static double m_nThreshold;
     

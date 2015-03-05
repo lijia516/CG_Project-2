@@ -125,9 +125,14 @@ Vec3d RayTracer::traceRay_DOF(ray& r, double x, double y) {
         
         double len = (eye - pos).length();
         
-        if ( len > TraceUI::m_nDOF) {
+        if ( (len > TraceUI::m_nDOF) && (!TraceUI::m_hasReverse) || (len < TraceUI::m_nDOF) && (TraceUI::m_hasReverse)) {
+        
+        
             
-            double diff = (len - TraceUI::m_nDOF)/len;
+            double diff;
+            
+            if (!TraceUI::m_hasReverse) diff = (len - TraceUI::m_nDOF)/len;
+            else diff = (TraceUI::m_nDOF - len)/TraceUI::m_nDOF;
             
             for (int i = 0; i < 16; i++) {
                 
@@ -160,7 +165,7 @@ Vec3d RayTracer::traceRay_DOF(ray& r, double x, double y) {
         
        //   cout << "do not have intersect\n";
         
-        if (!TraceUI::m_cubeMap) ret = traceRay(r, traceUI->getDepth());
+        if (!TraceUI::m_cubeMap || TraceUI::m_hasReverse) ret = traceRay(r, traceUI->getDepth());
         
         else {
             for (int i = 0; i < 16; i++) {

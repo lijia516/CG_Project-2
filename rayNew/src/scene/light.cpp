@@ -52,8 +52,6 @@ double PointLight::distanceAttenuation(const Vec3d& P) const
     double d = (position - P).length();
     d = 1.0 / (constantTerm + linearTerm * d + quadraticTerm * d * d);
     
-    //  std::cout<< "c, l, q: " << constantTerm << ", " << linearTerm<< ", "<< quadraticTerm << ", "<<"\n";
-    
     return min(d, 1.0);
 }
 
@@ -87,12 +85,10 @@ Vec3d PointLight::shadowAttenuation(const ray& r, const Vec3d& p) const
             color += calclulate(r,  p, Vec3d(i, j, position[2]));
             count++;
         }
-        
     }
     
     color /= count;
     return color;
-    
 }
 
 Vec3d PointLight::calclulate(const ray& r, const Vec3d& p, const Vec3d& position) const {
