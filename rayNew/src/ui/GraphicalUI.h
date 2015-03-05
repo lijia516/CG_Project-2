@@ -46,6 +46,7 @@ public:
     Fl_Slider*			m_filterSlider;
     Fl_Slider*			m_samplingSlider;
     Fl_Slider*			m_multiThreadsSlider;
+    Fl_Slider*			m_dofSlider;
 
 	Fl_Check_Button*	m_debuggingDisplayCheckButton;
 	Fl_Check_Button*	m_aaCheckButton;
@@ -56,6 +57,7 @@ public:
 	Fl_Check_Button*	m_bfCheckButton;
     
     Fl_Check_Button*	m_grCheckButton;
+    Fl_Check_Button*	m_dofCheckButton;
 
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
@@ -101,6 +103,7 @@ private:
 	static void cb_depthSlides(Fl_Widget* o, void* v);
 	static void cb_refreshSlides(Fl_Widget* o, void* v);
     static void cb_samplingSlides(Fl_Widget* o, void* v);
+    static void cb_dofSlides(Fl_Widget* o, void* v);
     static void cb_aaThreshSlider(Fl_Widget* o, void* v);
     static void cb_filterSlides(Fl_Widget* o, void* v);
     static void cb_multiThreadsSlides(Fl_Widget* o, void* v);
@@ -121,6 +124,7 @@ private:
     static void cb_aaCheckButton(Fl_Widget* o, void* v);
     
     static void cb_grCheckButton(Fl_Widget* o, void* v);
+    static void cb_dofCheckButton(Fl_Widget* o, void* v);
     
     static void cb_multiThreadsLightButton(Fl_Widget* o, void* v);
     static void cb_jitteredSupersampleLightButton(Fl_Widget* o, void* v);

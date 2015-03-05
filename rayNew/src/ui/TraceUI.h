@@ -55,9 +55,11 @@ public:
     
     static int	m_nKdDepth;	// number of samples
     static int  m_nKdLeaves;
+    static double  m_nDOF;
     
     static bool m_hasJitteredSupersample;
     static bool m_glossyRefection;
+    static bool m_DOF;
     static bool m_adaptiveAntiliasing;
     
     static double m_nThreshold;
@@ -81,6 +83,7 @@ protected:
 	bool m_displayDebuggingInfo;
     bool m_cubeMapInfo;
     bool m_grInfo;
+    bool m_dofInfo;
     bool m_kdInfo;
     bool m_aaInfo;
 	bool m_shadows;  // compute shadows?

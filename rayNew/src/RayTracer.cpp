@@ -43,7 +43,7 @@ Vec3d RayTracer::trace(double x, double y)
     
      Vec3d ret(0,0,0);
     
-    if (false) {
+    if (TraceUI::m_glossyRefection) {
         
        
         for (int i = 0; i < 16; i++) {
@@ -70,16 +70,11 @@ Vec3d RayTracer::trace(double x, double y)
         ret = ret / 16;
         
        
-    } else if (TraceUI::m_glossyRefection) {
-        
-     //   cout << "DOF\n";
+    } else if (TraceUI::m_DOF) {
         
          scene->getCamera().rayThrough(x,y,r);
         
          ret = traceRay_DOF(r, x, y);
-        
-        
-        
         
         
     } else {
@@ -125,23 +120,22 @@ Vec3d RayTracer::traceRay_DOF(ray& r, double x, double y) {
     
     if (scene->intersect(r,i)) {
         
-         cout << "has intersect\n";
-        
         Vec3d eye = scene->getCamera().getEye();
         Vec3d pos = r.at(i.t);
         
-        cout<<(eye - pos).length()<<"\n";
+        double len = (eye - pos).length();
         
-        if ((eye - pos).length() > 50) {
+        if ( len > TraceUI::m_nDOF) {
             
-            cout << ">> \n";
-            
+            double diff = (len - TraceUI::m_nDOF)/len;
             
             for (int i = 0; i < 16; i++) {
                 
-                
                 double dx = (static_cast<double>(rand() % 10) / 500) - 0.01f;
                 double dy = (static_cast<double>(rand() % 10) / 500) - 0.01f;
+                
+                dx = dx * diff;
+                dy = dy * diff;
                 
                 r.p += Vec3d(dx, dy, 0);
                 r.d -= Vec3d(dx, dy, 0);
@@ -157,8 +151,6 @@ Vec3d RayTracer::traceRay_DOF(ray& r, double x, double y) {
             ret = ret / 16;
             
         } else {
-            
-              cout << "<< \n";
           
               ret = traceRay(r, traceUI->getDepth());
             
@@ -168,7 +160,28 @@ Vec3d RayTracer::traceRay_DOF(ray& r, double x, double y) {
         
        //   cout << "do not have intersect\n";
         
-        ret = traceRay(r, traceUI->getDepth());
+        if (!TraceUI::m_cubeMap) ret = traceRay(r, traceUI->getDepth());
+        
+        else {
+            for (int i = 0; i < 16; i++) {
+                
+                double dx = (static_cast<double>(rand() % 10) / 500) - 0.01f;
+                double dy = (static_cast<double>(rand() % 10) / 500) - 0.01f;
+     
+                
+                r.p += Vec3d(dx, dy, 0);
+                r.d -= Vec3d(dx, dy, 0);
+                
+                Vec3d color = traceRay(r, traceUI->getDepth());
+                
+                color.clamp();
+                
+                ret += color ;
+            }
+            
+            ret = ret / 16;
+        
+        }
         
     }
     
@@ -202,16 +215,16 @@ Vec3d RayTracer::traceRay(ray& r, int depth)
         
         
         
-      //  if (TraceUI::m_glossyRefection) {
+        if (TraceUI::m_glossyRefection) {
             
             
-      //      double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-      //      double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
-      //      double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+            double dx = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+            double dy = (static_cast<double>(rand() % 10) / 500) - 0.001f;
+            double dz = (static_cast<double>(rand() % 10) / 500) - 0.001f;
             
-      //      i.N += Vec3d(dx, dy, dz);
+            i.N += Vec3d(dx, dy, dz);
             
-       // }
+        }
         
 
       

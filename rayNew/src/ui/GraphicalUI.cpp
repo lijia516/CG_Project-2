@@ -37,10 +37,13 @@ bool TraceUI::m_cubeMap = false;
 bool TraceUI::m_kd = false;
 bool TraceUI::m_hasJitteredSupersample = false;
 bool TraceUI::m_glossyRefection = false;
+bool TraceUI::m_DOF = false;
 bool TraceUI::m_adaptiveAntiliasing = false;
 
 int TraceUI::m_nKdDepth = 10;
 int TraceUI::m_nKdLeaves = 3;
+double TraceUI::m_nDOF = 50;
+
 double TraceUI::m_nAaThresh = 3;
 
 double TraceUI::m_nThreshold = 0;
@@ -188,11 +191,16 @@ void GraphicalUI::cb_samplingSlides(Fl_Widget* o, void* v)
 }
 
 
+void GraphicalUI::cb_dofSlides(Fl_Widget* o, void* v)
+{
+    ((GraphicalUI*)(o->user_data()))->m_nDOF=double( ((Fl_Slider *)o)->value() ) ;
+    
+    
+}
+
 void GraphicalUI::cb_aaThreshSlider(Fl_Widget* o, void* v)
 {
     ((GraphicalUI*)(o->user_data()))->m_nAaThresh=double( ((Fl_Slider *)o)->value() ) ;
-    
-    std::cout << "aa threshold: " << pUI->m_nAaThresh << "\n";
     
 }
 
@@ -229,7 +237,7 @@ void GraphicalUI::cb_refreshSlides(Fl_Widget* o, void* v)
 void GraphicalUI::cb_thresholdSlides(Fl_Widget* o, void* v)
 {
     ((GraphicalUI*)(o->user_data()))->m_nThreshold=double(((Fl_Slider *)o)->value()) ;
-    std::cout<<"m_nThreshold: "<<m_nThreshold<<"\n";
+   
 }
 
 
@@ -306,6 +314,28 @@ void GraphicalUI::cb_grCheckButton(Fl_Widget* o, void* v)
     
     std::cout << "m_glossyRefection: " << pUI->m_glossyRefection << "\n";
 }
+
+
+void GraphicalUI::cb_dofCheckButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    pUI->m_dofInfo = (((Fl_Check_Button*)o)->value() == 1);
+    if (pUI->m_dofInfo)
+    {
+        
+        pUI->m_DOF = true;
+    }
+    else
+    {
+        
+        pUI->m_DOF = false;
+    }
+    
+    
+    std::cout << "m_DOF: " << pUI->m_DOF << "\n";
+}
+
+
 
 
 void GraphicalUI::cb_aaCheckButton(Fl_Widget* o, void* v)
@@ -661,6 +691,19 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_samplingSlider->align(FL_ALIGN_RIGHT);
     m_samplingSlider->callback(cb_samplingSlides);
     
+    // install sampling slider
+    m_dofSlider = new Fl_Value_Slider(130, 310, 180, 20, "DOF");
+    m_dofSlider->user_data((void*)(this));	// record self to be used by static callback functions
+    m_dofSlider->type(FL_HOR_NICE_SLIDER);
+    m_dofSlider->labelfont(FL_COURIER);
+    m_dofSlider->labelsize(12);
+    m_dofSlider->minimum(1);
+    m_dofSlider->maximum(50);
+    m_dofSlider->step(0.05);
+    m_dofSlider->value(m_nDOF);
+    m_dofSlider->align(FL_ALIGN_RIGHT);
+    m_dofSlider->callback(cb_dofSlides);
+    
     
     
     
@@ -710,7 +753,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install multiThreads slider
-    m_treeDepthSlider = new Fl_Value_Slider(100, 340, 180, 20, "kd tree depth");
+    m_treeDepthSlider = new Fl_Value_Slider(130, 340, 180, 20, "kd tree depth");
     m_treeDepthSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_treeDepthSlider->type(FL_HOR_NICE_SLIDER);
     m_treeDepthSlider->labelfont(FL_COURIER);
@@ -724,7 +767,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_treeDepthSlider->deactivate();
     
     // install multiThreads slider
-    m_leafSizeSlider = new Fl_Value_Slider(100, 360, 180, 20, "kd tree leave size");
+    m_leafSizeSlider = new Fl_Value_Slider(130, 360, 180, 20, "kd tree leave size");
     m_leafSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_leafSizeSlider->type(FL_HOR_NICE_SLIDER);
     m_leafSizeSlider->labelfont(FL_COURIER);
@@ -763,6 +806,14 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_grCheckButton->user_data((void*)(this));
     m_grCheckButton->callback(cb_grCheckButton);
     m_grCheckButton->value(m_grInfo);
+    
+    
+    // set up debugging display checkbox
+    m_grCheckButton = new Fl_Check_Button(10, 310, 140, 20, "depth of field");
+    m_grCheckButton->user_data((void*)(this));
+    m_grCheckButton->callback(cb_dofCheckButton);
+    m_grCheckButton->value(m_dofInfo);
+    
     
     // set up debugging display checkbox
     m_aaCheckButton = new Fl_Check_Button(10, 280, 140, 20, "adaptive antialiasing");
