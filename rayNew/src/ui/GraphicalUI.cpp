@@ -42,10 +42,10 @@ bool TraceUI::m_adaptiveAntiliasing = false;
 
 int TraceUI::m_nKdDepth = 10;
 int TraceUI::m_nKdLeaves = 3;
+
+double TraceUI::m_nFilter = 0;
 double TraceUI::m_nDOF = 50;
-
 double TraceUI::m_nAaThresh = 3;
-
 double TraceUI::m_nThreshold = 0;
 
 static int gobal_y;
@@ -207,7 +207,7 @@ void GraphicalUI::cb_aaThreshSlider(Fl_Widget* o, void* v)
 
 void GraphicalUI::cb_filterSlides(Fl_Widget* o, void* v)
 {
-    ((GraphicalUI*)(o->user_data()))->m_nFilter=int( ((Fl_Slider *)o)->value() ) ;
+    ((GraphicalUI*)(o->user_data()))->m_nFilter=double( ((Fl_Slider *)o)->value() ) ;
 }
 
 void GraphicalUI::cb_multiThreadsSlides(Fl_Widget* o, void* v)
@@ -724,14 +724,14 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install sampling slider
-    m_filterSlider = new Fl_Value_Slider(10, 125, 180, 20, "filter slider");
+    m_filterSlider = new Fl_Value_Slider(10, 125, 180, 20, "soft shadow size");
     m_filterSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_filterSlider->type(FL_HOR_NICE_SLIDER);
     m_filterSlider->labelfont(FL_COURIER);
     m_filterSlider->labelsize(12);
-    m_filterSlider->minimum(1);
-    m_filterSlider->maximum(16);
-    m_filterSlider->step(1);
+    m_filterSlider->minimum(0);
+    m_filterSlider->maximum(2);
+    m_filterSlider->step(0.1);
     m_filterSlider->value(m_nFilter);
     m_filterSlider->align(FL_ALIGN_RIGHT);
     m_filterSlider->callback(cb_filterSlides);

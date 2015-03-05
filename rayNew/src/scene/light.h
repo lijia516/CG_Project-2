@@ -65,6 +65,7 @@ public:
 	virtual double distanceAttenuation(const Vec3d& P) const;
 	virtual Vec3d getColor() const;
 	virtual Vec3d getDirection(const Vec3d& P) const;
+    Vec3d calclulate(const ray& r, const Vec3d& p, const Vec3d& position) const;
 
 	void setAttenuationConstants(float a, float b, float c)
 	{

@@ -74,8 +74,35 @@ Vec3d PointLight::shadowAttenuation(const ray& r, const Vec3d& p) const
 {
   // YOUR CODE HERE:
   // You should implement shadow-handling code here.
+    
+    
+    double size = TraceUI::m_nFilter;
+    
+    Vec3d color(0,0,0);
+    
+    int count = 0;
+    for (double i = -size + position[0]; i <= size + position[0]; i = i + 0.2) {
+        for (double j = -size + position[1]; j <= size + position[1]; j = j + 0.2) {
+            
+            color += calclulate(r,  p, Vec3d(i, j, position[2]));
+            count++;
+        }
+        
+    }
+    
+    color /= count;
+    return color;
+    
+}
+
+Vec3d PointLight::calclulate(const ray& r, const Vec3d& p, const Vec3d& position) const {
+    
+    Vec3d dir = position - p;
+    dir.normalize();
+    
+    
     isect i;
-    ray light_ray(p, getDirection(p), ray::VISIBILITY);
+    ray light_ray(p, dir, ray::VISIBILITY);
     
     if (scene->intersect(light_ray, i)) {
         
@@ -93,4 +120,5 @@ Vec3d PointLight::shadowAttenuation(const ray& r, const Vec3d& p) const
         }
     }
     return Vec3d(1,1,1);
+    
 }

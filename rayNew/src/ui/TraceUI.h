@@ -18,7 +18,7 @@ class RayTracer;
 
 class TraceUI {
 public:
-	TraceUI() : m_nDepth(0), m_nSize(512), m_nSampling(1), m_nFilter(1), m_nMultiThreads(1),m_displayDebuggingInfo(false),
+	TraceUI() : m_nDepth(0), m_nSize(512), m_nSampling(1), m_nMultiThreads(1),m_displayDebuggingInfo(false),
                     m_shadows(true), m_smoothshade(true), raytracer(0),
                     m_nFilterWidth(1)
                     {}
@@ -56,6 +56,7 @@ public:
     static int	m_nKdDepth;	// number of samples
     static int  m_nKdLeaves;
     static double  m_nDOF;
+    static double m_nFilter;
     
     static bool m_hasJitteredSupersample;
     static bool m_glossyRefection;
@@ -73,7 +74,7 @@ protected:
 	int	m_nSize;	// Size of the traced image
 	int	m_nDepth;	// Max depth of recursion
     int	m_nSampling;	// number of samples
-    int	m_nFilter;	// number of samples
+   // int	m_nFilter;	// number of samples
     int	m_nMultiThreads;	// number of samples
     
 
