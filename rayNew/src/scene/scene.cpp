@@ -166,7 +166,7 @@ void KdTree::splitTree(KdNode *node, int depth){
     }
 }
 
-//dfs
+
 void KdTree::searchTree(KdNode *node, ray &r, std::vector<Geometry*> &result){
     
     

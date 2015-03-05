@@ -57,6 +57,8 @@ public:
 	Fl_Check_Button*	m_bfCheckButton;
     
     Fl_Check_Button*	m_grCheckButton;
+    Fl_Check_Button*	m_bbmCheckButton;
+    Fl_Check_Button*	m_aatCheckButton;
     Fl_Check_Button*	m_dofCheckButton;
 
 	Fl_Button*			m_renderButton;
@@ -93,6 +95,7 @@ private:
 	static GraphicalUI* whoami(Fl_Menu_* o);
 
 	static void cb_load_scene(Fl_Menu_* o, void* v);
+    static void cb_load_backgroundImage(Fl_Menu_* o, void* v);
 	static void cb_save_image(Fl_Menu_* o, void* v);
 	static void cb_exit(Fl_Menu_* o, void* v);
 	static void cb_about(Fl_Menu_* o, void* v);
@@ -125,6 +128,8 @@ private:
     static void cb_aaCheckButton(Fl_Widget* o, void* v);
     
     static void cb_grCheckButton(Fl_Widget* o, void* v);
+    static void cb_bbmCheckButton(Fl_Widget* o, void* v);
+    static void cb_aatCheckButton(Fl_Widget* o, void* v);
     static void cb_dofCheckButton(Fl_Widget* o, void* v);
     
     static void cb_multiThreadsLightButton(Fl_Widget* o, void* v);

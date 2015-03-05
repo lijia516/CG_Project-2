@@ -37,6 +37,8 @@ bool TraceUI::m_cubeMap = false;
 bool TraceUI::m_kd = false;
 bool TraceUI::m_hasJitteredSupersample = false;
 bool TraceUI::m_glossyRefection = false;
+bool TraceUI::m_bbm = false;
+bool TraceUI::m_aat = false;
 bool TraceUI::m_DOF = false;
 bool TraceUI::m_adaptiveAntiliasing = false;
 bool TraceUI::m_hasReverse = false;
@@ -83,6 +85,37 @@ void GraphicalUI::cb_load_scene(Fl_Menu_* o, void* v)
 		pUI->m_debuggingWindow->redraw();
 	}
 }
+
+
+
+void GraphicalUI::cb_load_backgroundImage(Fl_Menu_* o, void* v)
+{
+    pUI = whoami(o);
+    
+    static char* lastFile = 0;
+    char* newfile = fl_file_chooser("Open BackgroundImage ?", "*.ray", NULL );
+    
+    
+    //  std::cout<< "load file: " <<"\n";
+    
+    if (newfile != NULL) {
+        char buf[256];
+        //     std::cout<< "before load scence: " <<"\n";
+        if (pUI->raytracer->loadBackgroundImage(newfile)) {
+            
+            //        std::cout<< "after load scence: " <<"\n";
+            
+            print(buf, "BackgroundImage <%s>", newfile);
+            
+        } else print(buf, "BackgroundImage <Not Loaded>");
+        
+    }
+    
+    
+    //  std::cout<< "finish load file: " <<"\n";
+    
+}
+
 
 void GraphicalUI::cb_save_image(Fl_Menu_* o, void* v) 
 {
@@ -333,6 +366,45 @@ void GraphicalUI::cb_grCheckButton(Fl_Widget* o, void* v)
     std::cout << "m_glossyRefection: " << pUI->m_glossyRefection << "\n";
 }
 
+void GraphicalUI::cb_bbmCheckButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    pUI->m_bbmInfo = (((Fl_Check_Button*)o)->value() == 1);
+    if (pUI->m_bbmInfo)
+    {
+        
+        pUI->m_bbm= true;
+    }
+    else
+    {
+        
+        pUI->m_bbm = false;
+    }
+    
+    
+    std::cout << "m_bbm: " << pUI->m_bbm << "\n";
+}
+
+void GraphicalUI::cb_aatCheckButton(Fl_Widget* o, void* v)
+{
+    pUI=(GraphicalUI*)(o->user_data());
+    pUI->m_aatInfo = (((Fl_Check_Button*)o)->value() == 1);
+    if (pUI->m_aatInfo)
+    {
+        
+        pUI->m_aat= true;
+    }
+    else
+    {
+        
+        pUI->m_aat = false;
+    }
+    
+    
+    std::cout << "m_aat: " << pUI->m_aat << "\n";
+}
+
+
 
 void GraphicalUI::cb_dofCheckButton(Fl_Widget* o, void* v)
 {
@@ -404,6 +476,8 @@ void GraphicalUI::cb_render(Fl_Widget* o, void* v) {
             }
             for(auto& t : threads) t.join();
             
+            gobal_y = 0;
+            
         } else {
             
             clock_t now, prev;
@@ -473,16 +547,19 @@ void GraphicalUI::call_from_thread(GraphicalUI* pUI, bool stopTrace, char* buffe
         {
             if (stopTrace) break;
             // check for input and refresh view every so often while tracing
-            // now = clock();
-            // if ((now - prev)/CLOCKS_PER_SEC * 1000 >= intervalMS)
-            // {
-            //      prev = now;
-            //      sprintf(buffer, "(%d%%) %s", (int)((double)y / (double)height * 100.0), old_label);
-            //      pUI->m_traceGlWindow->label(buffer);
-            //      pUI->m_traceGlWindow->refresh();
-            //      Fl::check();
-            //     if (Fl::damage()) { Fl::flush(); }
-            // }
+            /*
+             now = clock();
+             if ((now - prev)/CLOCKS_PER_SEC * 1000 >= intervalMS)
+             {
+                  prev = now;
+                  sprintf(buffer, "(%d%%) %s", (int)((double)y / (double)height * 100.0), old_label);
+                  pUI->m_traceGlWindow->label(buffer);
+                  pUI->m_traceGlWindow->refresh();
+                  Fl::check();
+                 if (Fl::damage()) { Fl::flush(); }
+             }
+            
+            */
             // look for input and refresh window
             
             //std::cout<< "x, y " << x << "," << y <<"\n";
@@ -584,6 +661,7 @@ void GraphicalUI::setRayTracer(RayTracer *tracer)
 Fl_Menu_Item GraphicalUI::menuitems[] = {
 	{ "&File", 0, 0, 0, FL_SUBMENU },
 	{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)GraphicalUI::cb_load_scene },
+    { "&Load BumpMap...",	FL_ALT + 'l', (Fl_Callback *)GraphicalUI::cb_load_backgroundImage },
 	{ "&Save Image...", FL_ALT + 's', (Fl_Callback *)GraphicalUI::cb_save_image },
 	{ "&Exit", FL_ALT + 'e', (Fl_Callback *)GraphicalUI::cb_exit },
 	{ 0 },
@@ -602,7 +680,7 @@ void GraphicalUI::stopTracing()
 
 GraphicalUI::GraphicalUI() : refreshInterval(10) {
 	// init.
-	m_mainWindow = new Fl_Window(100, 40, 450, 459, "Ray <Not Loaded>");
+	m_mainWindow = new Fl_Window(100, 40, 450, 500, "Ray <Not Loaded>");
 	m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 	// install menu bar
 	m_menubar = new Fl_Menu_Bar(0, 0, 440, 25);
@@ -620,7 +698,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // set up "antiAliased" button
-    m_antiAliasedButton = new Fl_Button(330, 220, 110, 25, "&Anti-aliased");
+    m_antiAliasedButton = new Fl_Button(330, 235, 110, 25, "&Anti-aliased");
     m_antiAliasedButton->user_data((void*)(this));
     m_antiAliasedButton->callback(cb_antiAliased);
     
@@ -633,13 +711,13 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_multiThreadsLightButton->callback(cb_multiThreadsLightButton);
     
     // Add multi Threads button
-    m_reverseLightButton = new Fl_Light_Button(350,310,80,25,"&reverse");
+    m_reverseLightButton = new Fl_Light_Button(360,340,80,25,"&Reverse");
     m_reverseLightButton->user_data((void*)(this));   // record self to be used by static callback functions
     m_reverseLightButton->callback(cb_reverseLightButton);
     
     
     // Add multi Threads button
-    m_jitteredSupersampleLightButton = new Fl_Light_Button(290,280,150,25,"&jittered Supersample");
+    m_jitteredSupersampleLightButton = new Fl_Light_Button(290,290,150,25,"&jittered Supersample");
     m_jitteredSupersampleLightButton->user_data((void*)(this));   // record self to be used by static callback functions
     m_jitteredSupersampleLightButton->callback(cb_jitteredSupersampleLightButton);
     
@@ -687,7 +765,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install refresh interval slider
-    m_thresholdSlider = new Fl_Value_Slider(10, 160, 180, 20, "daptive termination threshold");
+    m_thresholdSlider = new Fl_Value_Slider(10, 160, 180, 20, "Daptive termination threshold");
     m_thresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_thresholdSlider->type(FL_HOR_NICE_SLIDER);
     m_thresholdSlider->labelfont(FL_COURIER);
@@ -702,7 +780,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install sampling slider
-    m_samplingSlider = new Fl_Value_Slider(10, 220, 180, 20, "Samples number");
+    m_samplingSlider = new Fl_Value_Slider(10, 235, 180, 20, "Samples number");
     m_samplingSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_samplingSlider->type(FL_HOR_NICE_SLIDER);
     m_samplingSlider->labelfont(FL_COURIER);
@@ -715,7 +793,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_samplingSlider->callback(cb_samplingSlides);
     
     // install sampling slider
-    m_dofSlider = new Fl_Value_Slider(130, 310, 180, 20, "DOF");
+    m_dofSlider = new Fl_Value_Slider(120, 340, 180, 20, "Distance");
     m_dofSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_dofSlider->type(FL_HOR_NICE_SLIDER);
     m_dofSlider->labelfont(FL_COURIER);
@@ -731,7 +809,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install sampling slider
-    m_aaThreshSlider = new Fl_Value_Slider(10, 250, 180, 20, "adaptive anti-aliasing threshold");
+    m_aaThreshSlider = new Fl_Value_Slider(10, 260, 180, 20, "Adaptive anti-aliasing threshold");
     m_aaThreshSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_aaThreshSlider->type(FL_HOR_NICE_SLIDER);
     m_aaThreshSlider->labelfont(FL_COURIER);
@@ -754,7 +832,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_filterSlider->labelsize(12);
     m_filterSlider->minimum(0);
     m_filterSlider->maximum(2);
-    m_filterSlider->step(0.1);
+    m_filterSlider->step(0.2);
     m_filterSlider->value(m_nFilter);
     m_filterSlider->align(FL_ALIGN_RIGHT);
     m_filterSlider->callback(cb_filterSlides);
@@ -776,7 +854,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // install multiThreads slider
-    m_treeDepthSlider = new Fl_Value_Slider(130, 340, 180, 20, "kd tree depth");
+    m_treeDepthSlider = new Fl_Value_Slider(120, 370, 180, 20, "kd tree depth");
     m_treeDepthSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_treeDepthSlider->type(FL_HOR_NICE_SLIDER);
     m_treeDepthSlider->labelfont(FL_COURIER);
@@ -790,7 +868,7 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     m_treeDepthSlider->deactivate();
     
     // install multiThreads slider
-    m_leafSizeSlider = new Fl_Value_Slider(130, 360, 180, 20, "kd tree leave size");
+    m_leafSizeSlider = new Fl_Value_Slider(120, 390, 180, 20, "kd tree leave size");
     m_leafSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
     m_leafSizeSlider->type(FL_HOR_NICE_SLIDER);
     m_leafSizeSlider->labelfont(FL_COURIER);
@@ -805,41 +883,53 @@ GraphicalUI::GraphicalUI() : refreshInterval(10) {
     
     
     // kd tree check box
-    m_kdCheckButton = new Fl_Check_Button(10, 345, 80, 20, "Kd Tree");
+    m_kdCheckButton = new Fl_Check_Button(10, 375, 80, 20, "Kd Tree");
     m_kdCheckButton->user_data((void*)(this));
     m_kdCheckButton->callback(cb_kdCheckButton);
     m_kdCheckButton->value(m_kdInfo);
     
     
 	// set up debugging display checkbox
-	m_debuggingDisplayCheckButton = new Fl_Check_Button(10, 429, 140, 20, "Debugging display");
+	m_debuggingDisplayCheckButton = new Fl_Check_Button(10, 459, 140, 20, "Debugging display");
 	m_debuggingDisplayCheckButton->user_data((void*)(this));
 	m_debuggingDisplayCheckButton->callback(cb_debuggingDisplayCheckButton);
 	m_debuggingDisplayCheckButton->value(m_displayDebuggingInfo);
     
     // set up debugging display checkbox
-    m_cubeMapCheckButton = new Fl_Check_Button(10, 400, 140, 20, "Cube Map Chooser");
+    m_cubeMapCheckButton = new Fl_Check_Button(10, 430, 140, 20, "Cube Map Chooser");
     m_cubeMapCheckButton->user_data((void*)(this));
     m_cubeMapCheckButton->callback(cb_cubeMapCheckButton);
     m_cubeMapCheckButton->value(m_cubeMapInfo);
     
     
     // set up debugging display checkbox
-    m_grCheckButton = new Fl_Check_Button(200, 400, 140, 20, "glossy reflection");
+    m_grCheckButton = new Fl_Check_Button(160, 430, 140, 20, "glossy reflection");
     m_grCheckButton->user_data((void*)(this));
     m_grCheckButton->callback(cb_grCheckButton);
     m_grCheckButton->value(m_grInfo);
     
+    // set up debugging display checkbox
+    m_bbmCheckButton = new Fl_Check_Button(160, 459, 140, 20, "bump mapping");
+    m_bbmCheckButton->user_data((void*)(this));
+    m_bbmCheckButton->callback(cb_bbmCheckButton);
+    m_bbmCheckButton->value(m_bbmInfo);
+    
     
     // set up debugging display checkbox
-    m_grCheckButton = new Fl_Check_Button(10, 310, 140, 20, "depth of field");
+    m_aatCheckButton = new Fl_Check_Button(280, 459, 140, 20, "anti-aliase Texture Map");
+    m_aatCheckButton->user_data((void*)(this));
+    m_aatCheckButton->callback(cb_aatCheckButton);
+    m_aatCheckButton->value(m_aatInfo);
+    
+    // set up debugging display checkbox
+    m_grCheckButton = new Fl_Check_Button(10, 340, 140, 20, "Depth of Field");
     m_grCheckButton->user_data((void*)(this));
     m_grCheckButton->callback(cb_dofCheckButton);
     m_grCheckButton->value(m_dofInfo);
     
     
     // set up debugging display checkbox
-    m_aaCheckButton = new Fl_Check_Button(10, 280, 140, 20, "adaptive antialiasing");
+    m_aaCheckButton = new Fl_Check_Button(10, 290, 140, 20, "adaptive antialiasing");
     m_aaCheckButton->user_data((void*)(this));
     m_aaCheckButton->callback(cb_aaCheckButton);
     m_aaCheckButton->value(m_aaInfo);

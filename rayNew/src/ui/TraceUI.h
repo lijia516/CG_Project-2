@@ -60,6 +60,8 @@ public:
     
     static bool m_hasJitteredSupersample;
     static bool m_glossyRefection;
+    static bool m_bbm;
+    static bool m_aat;
     static bool m_DOF;
     static bool m_adaptiveAntiliasing;
     static bool m_hasReverse;
@@ -85,6 +87,8 @@ protected:
 	bool m_displayDebuggingInfo;
     bool m_cubeMapInfo;
     bool m_grInfo;
+    bool m_bbmInfo;
+    bool m_aatInfo;
     bool m_dofInfo;
     bool m_kdInfo;
     bool m_aaInfo;

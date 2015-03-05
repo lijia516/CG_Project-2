@@ -9,6 +9,9 @@
 
 #include "parser/Tokenizer.h"
 #include "parser/Parser.h"
+#include "fileio/bitmap.h"
+
+#include <FL/fl_ask.H>
 
 #include "ui/TraceUI.h"
 #include <cmath>
@@ -21,6 +24,10 @@ extern TraceUI* traceUI;
 
 
 using namespace std;
+unsigned char* RayTracer::backgroundImage = NULL;
+int RayTracer::backgroundImage_width = 0;
+int RayTracer::backgroundImage_height = 0;
+bool RayTracer::hasBackgroundImage = false;
 
 
 // Use this variable to decide if you want to print out
@@ -368,6 +375,38 @@ bool RayTracer::loadScene( char* fn ) {
 
 	return true;
 }
+
+
+
+bool RayTracer::loadBackgroundImage(char *iname)
+{
+    // try to open the image to read
+    unsigned char*	back_data;
+    int				width,
+    height;
+    
+    if ( (back_data=readBMP(iname, width, height))==NULL )
+    {
+        fl_alert("Can't load bitmap file");
+        return false;
+    }
+    
+    // reflect the fact of loading the new image
+    backgroundImage_width	= width;
+    backgroundImage_height	= height;
+    
+    std::cout << "Background w, h: " << width <<","<<height<<"\n";
+    
+    // release old storage
+    delete [] backgroundImage;
+    backgroundImage	= back_data;
+    hasBackgroundImage = true;
+    
+    std::cout << "finish load background image" <<"\n";
+    return true;
+}
+
+
 
 void RayTracer::traceSetup(int w, int h)
 {
